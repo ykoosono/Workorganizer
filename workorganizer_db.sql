@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 26, 2025 at 05:26 PM
+-- Generation Time: Mar 03, 2025 at 05:57 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -83,6 +83,7 @@ INSERT INTO `roles` (`id`, `role_name`) VALUES
 --
 
 CREATE TABLE `role_permissions` (
+  `id` int(3) NOT NULL,
   `role_id` int(11) NOT NULL,
   `permission_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -91,14 +92,14 @@ CREATE TABLE `role_permissions` (
 -- Dumping data for table `role_permissions`
 --
 
-INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
-(1, 1),
-(1, 2),
-(1, 3),
-(1, 4),
-(2, 1),
-(2, 2),
-(3, 1);
+INSERT INTO `role_permissions` (`id`, `role_id`, `permission_id`) VALUES
+(1, 1, 1),
+(2, 1, 2),
+(3, 1, 3),
+(4, 1, 4),
+(5, 2, 1),
+(6, 2, 2),
+(7, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -107,12 +108,24 @@ INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
 --
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users_calendars`
+--
+
+CREATE TABLE `users_calendars` (
+  `id` int(3) NOT NULL,
+  `calendar_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -143,16 +156,24 @@ ALTER TABLE `roles`
 -- Indexes for table `role_permissions`
 --
 ALTER TABLE `role_permissions`
-  ADD PRIMARY KEY (`role_id`,`permission_id`),
-  ADD KEY `permission_id` (`permission_id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `permission_id` (`permission_id`),
+  ADD KEY `role_id` (`role_id`);
 
 --
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`),
+  ADD PRIMARY KEY (`user_id`),
   ADD KEY `role_id` (`role_id`);
+
+--
+-- Indexes for table `users_calendars`
+--
+ALTER TABLE `users_calendars`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `calendar_id` (`calendar_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -177,10 +198,22 @@ ALTER TABLE `roles`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `role_permissions`
+--
+ALTER TABLE `role_permissions`
+  MODIFY `id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users_calendars`
+--
+ALTER TABLE `users_calendars`
+  MODIFY `id` int(3) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -190,14 +223,21 @@ ALTER TABLE `users`
 -- Constraints for table `role_permissions`
 --
 ALTER TABLE `role_permissions`
-  ADD CONSTRAINT `role_permissions_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
-  ADD CONSTRAINT `role_permissions_ibfk_2` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`);
+  ADD CONSTRAINT `role_permissions_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
+  ADD CONSTRAINT `role_permissions_ibfk_3` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`);
 
 --
 -- Constraints for table `users`
 --
 ALTER TABLE `users`
-  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `role_permissions` (`id`);
+
+--
+-- Constraints for table `users_calendars`
+--
+ALTER TABLE `users_calendars`
+  ADD CONSTRAINT `users_calendars_ibfk_1` FOREIGN KEY (`calendar_id`) REFERENCES `calendar` (`id`),
+  ADD CONSTRAINT `users_calendars_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
