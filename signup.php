@@ -21,18 +21,26 @@
                         <div class="valid-feedback">Valid.</div>
                         <div class="invalid-feedback">Please fill out this field.</div>
                     </div>
-                    <div class="col-md-6">
+                     <div class="col-sm-6">
                         <label for="pswd" class="form-label">Password:</label>
                         <input type="password" class="form-control" placeholder="Enter password" name="pswd" required>
                         <div class="valid-feedback">Valid.</div>
                         <div class="invalid-feedback">Please fill out this field.</div>
                     </div>
                 </div>
-                <div class="form-row">
-                    <label for="email" class="form-label">Email:</label>
-                    <input class="form-control" placeholder="Email address" name="email" required>
-                    <div class="valid-feedback">Valid.</div>
-                    <div class="invalid-feedback">Please fill out this field.</div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email:</label>
+                        <input class="form-control" placeholder="Email address" name="email" required>
+                        <div class="valid-feedback">Valid.</div>
+                        <div class="invalid-feedback">Please fill out this field.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="pswd" class="form-label">Confirm Password:</label>
+                        <input type="password" class="form-control" placeholder="Confirm password" required>
+                        <div class="valid-feedback">Valid.</div>
+                        <div class="invalid-feedback">Please fill out this field.</div>
+                    </div>
                 </div>
                 <div class="item">
                     <input type="submit" value="Submit" />
