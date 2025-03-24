@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 03, 2025 at 05:57 PM
+-- Generation Time: Mar 03, 2025 at 06:17 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,7 +29,6 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `calendar` (
   `id` int(11) NOT NULL,
-  `users` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`users`)),
   `start_date` datetime NOT NULL,
   `end_date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -112,7 +111,6 @@ CREATE TABLE `users` (
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `role_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -125,7 +123,8 @@ CREATE TABLE `users` (
 CREATE TABLE `users_calendars` (
   `id` int(3) NOT NULL,
   `calendar_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL
+  `user_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -164,8 +163,7 @@ ALTER TABLE `role_permissions`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`),
-  ADD KEY `role_id` (`role_id`);
+  ADD PRIMARY KEY (`user_id`);
 
 --
 -- Indexes for table `users_calendars`
@@ -173,7 +171,8 @@ ALTER TABLE `users`
 ALTER TABLE `users_calendars`
   ADD PRIMARY KEY (`id`),
   ADD KEY `calendar_id` (`calendar_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `role_id` (`role_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -227,17 +226,12 @@ ALTER TABLE `role_permissions`
   ADD CONSTRAINT `role_permissions_ibfk_3` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`);
 
 --
--- Constraints for table `users`
---
-ALTER TABLE `users`
-  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `role_permissions` (`id`);
-
---
 -- Constraints for table `users_calendars`
 --
 ALTER TABLE `users_calendars`
   ADD CONSTRAINT `users_calendars_ibfk_1` FOREIGN KEY (`calendar_id`) REFERENCES `calendar` (`id`),
-  ADD CONSTRAINT `users_calendars_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
+  ADD CONSTRAINT `users_calendars_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `users_calendars_ibfk_3` FOREIGN KEY (`role_id`) REFERENCES `role_permissions` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
