@@ -36,8 +36,8 @@
                         <div class="invalid-feedback">Please fill out this field.</div>
                     </div>
                     <div class="col-md-6">
-                        <label for="pswd" class="form-label">Confirm Password:</label>
-                        <input type="password" class="form-control" placeholder="Confirm password" required>
+                        <label for="pswd2" class="form-label">Confirm Password:</label>
+                        <input type="password" class="form-control" placeholder="Confirm password" name="pswd2" required>
                         <div class="valid-feedback">Valid.</div>
                         <div class="invalid-feedback">Please fill out this field.</div>
                     </div>
