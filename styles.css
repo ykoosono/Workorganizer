@@ -1,0 +1,110 @@
+/* Base styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body, html {
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Centering Container */
+.container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to right, #717e91, #736f79);
+    padding: 1rem;
+}
+
+/* Login Box */
+.login-box {
+    background-color: #ffffff;
+    padding: 2.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Heading */
+.login-box h2 {
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Form */
+.form-group {
+    text-align: left;
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Submit Button */
+button[type="submit"] {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #0d6efd;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #084db3;
+}
+
+.auth-links {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.auth-links .create-account {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.auth-links .create-account a {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-links .create-account a:hover {
+    text-decoration: underline;
+}
+
+.forgot-password {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-decoration: none;
+    display: block;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
