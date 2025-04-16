@@ -10,5 +10,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Project/PHP/PHPProject.php to edi
     </head>
     <body>
         <a href="signup.php"> Sign Up</a>
+        <a href="addCalendar.php">Add Calendar</a>
     </body>
 </html>
