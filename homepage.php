@@ -7,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-<body>
+<body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="javascript:void(0)">Home</a>
@@ -22,7 +22,7 @@
       </ul>
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link btn btn-danger text-white px-3" href="Index.php">Sign Out</a>
+          <a class="nav-link btn btn-danger text-white px-3" href="signout.php">Sign Out</a>
         </li>
       </ul>
     </div>
