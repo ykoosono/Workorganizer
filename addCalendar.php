@@ -10,11 +10,11 @@
     
     <body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
         <!-- Header -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="homepage.php">WorkOrganizer</a>
-    </div>
-  </nav>
+        <nav class="navbar navbar-dark bg-dark">
+            <div class="container-fluid">
+            <a class="navbar-brand" href="homepage.php">WorkOrganizer</a>
+            </div>
+        </nav>
         <div class="container fluid">
             <h1>Add Calendar</h1>
             
@@ -260,9 +260,9 @@
             
         </div>
         <!-- Footer -->
-  <footer class="text-center mt-5 p-3 bg-light">
-    <p>&copy; 2025 WorkOrganizer. All rights reserved.</p>
-  </footer>
+        <footer class="text-center mt-5 p-3 bg-light">
+            <p>&copy; 2025 WorkOrganizer. All rights reserved.</p>
+        </footer>
     </body>
 </html>
 
