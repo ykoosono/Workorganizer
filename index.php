@@ -1,22 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Bootstrap Example</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</head>
-<body>
+<?php
+session_start();
 
-<div class="container mt-3">
-  <h2>Temp Page</h2>
-  <ul class="nav">
-    <li class="nav-item">
-      <a class="nav-link" href="Homepage.php">Home Page</a>
-    </li>
- 
-
-</body>
-</html>
-
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    header("Location: homepage.php");
+    exit();
+} else {
+    header("Location: login.php");
+    exit();
+}
