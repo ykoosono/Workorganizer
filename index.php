@@ -1,15 +1,10 @@
-<!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Project/PHP/PHPProject.php to edit this template
--->
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title></title>
-    </head>
-    <body>
-        <a href="signup.php"> Sign Up</a>
-        <a href="addCalendar.php">Add Calendar</a>
-    </body>
-</html>
+<?php
+session_start();
+
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    header("Location: homepage.php");
+    exit();
+} else {
+    header("Location: login.php");
+    exit();
+}

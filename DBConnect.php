@@ -1,4 +1,17 @@
+
 <?php
+$host = "localhost";
+$dbname2 = "workorganizer_db";
+$username2 = "root";
+$password2 = "";
+
+// Create connection
+$conn2 = new mysqli($host, $username2, $password2, $dbname2);
+
+// Check connection
+if ($conn2->connect_error) {
+    die("Connection failed: " . $conn2->connect_error);
+}
 
 $servername = "localhost";
 $username = "mahadev";
@@ -73,3 +86,4 @@ function loginDB($sql, $user, $pwd) {
   return $message;
 }
 ?>
+
