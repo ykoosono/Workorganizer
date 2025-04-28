@@ -1,32 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Bootstrap Example</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</head>
-<body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="javascript:void(0)">Home</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="mynavbar">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="javascript:void(0)">New Calendar</a>
-        </li>
-      </ul>
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link btn btn-danger text-white px-3" href="signout.php">Sign Out</a>
-        </li>
-      </ul>
+<?php include 'header.php'; ?>
+
+<div class="d-flex flex-column min-vh-100">
+  <main class="flex-grow-1">
+    <div class="container mt-5">
+      <h2 class="mb-4">My Calendars</h2>
+
+      <!-- Functional Buttons -->
+      <div class="row mb-4 align-items-center">
+        <div class="col-md-4 mb-2 mb-md-0">
+          <a href="create-calendar.html" class="btn btn-success w-100">
+            <i class="bi bi-plus-circle"></i> Add New Calendar
+          </a>
+        </div>
+
+        <div class="col-md-4 mb-2 mb-md-0">
+          <div class="dropdown w-100">
+            <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Sort Calendars
+            </button>
+            <ul class="dropdown-menu w-100">
+              <li><a class="dropdown-item" href="?sort=recent">Most Recent</a></li>
+              <li><a class="dropdown-item" href="?sort=alpha">Alphabetically</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <form class="d-flex" action="search-calendars.php" method="get">
+            <input class="form-control me-2" type="search" name="query" placeholder="Search calendars..." aria-label="Search">
+            <button class="btn btn-primary" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Calendars grid -->
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <!-- Example calendar card -->
+        <div class="col">
+          <div class="card shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="card-title">Team Project Calendar</h5>
+              <p class="card-text">Track milestones and deadlines for our current project.</p>
+              <a href="#" class="btn btn-primary">View Calendar</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Another calendar card -->
+        <div class="col">
+          <div class="card shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="card-title">Marketing Events</h5>
+              <p class="card-text">All key marketing campaign dates and events.</p>
+              <a href="#" class="btn btn-primary">View Calendar</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add more dynamic cards here -->
+      </div>
     </div>
-  </div>
-</nav>
-</body>
-</html>
+  </main>
+
+  <?php include 'footer.php'; ?>
+</div>

@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-<body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
+<body style="background: linear-gradient(135deg, #c1d3df, #a7bbc7); min-height: 100vh;">
 
   <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid">
