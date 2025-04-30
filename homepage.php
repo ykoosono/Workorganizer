@@ -1,4 +1,19 @@
+
 <?php include 'header.php'; ?>
+<?php
+$host = 'localhost';
+$db = 'workorganizer_db'; // ✅ corrected name
+$user = 'root'; // ← replace with your actual DB username
+$pass = ''; // ← replace with your actual DB password
+$pdo = null;
+try {
+  $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+  die("Database connection failed: " . $e->getMessage());
+}
+?>
+
 
 <div class="d-flex flex-column min-vh-100">
   <main class="flex-grow-1">
@@ -8,7 +23,7 @@
       <!-- Functional Buttons -->
       <div class="row mb-4 align-items-center">
         <div class="col-md-4 mb-2 mb-md-0">
-          <a href="create-calendar.html" class="btn btn-success w-100">
+          <a href="addCalendar.php" class="btn btn-success w-100">
             <i class="bi bi-plus-circle"></i> Add New Calendar
           </a>
         </div>
@@ -36,26 +51,36 @@
       <!-- Calendars grid -->
       <div class="row row-cols-1 row-cols-md-3 g-4">
         <!-- Example calendar card -->
-        <div class="col">
-          <div class="card shadow-sm h-100">
-            <div class="card-body">
-              <h5 class="card-title">Team Project Calendar</h5>
-              <p class="card-text">Track milestones and deadlines for our current project.</p>
-              <a href="#" class="btn btn-primary">View Calendar</a>
-            </div>
-          </div>
-        </div>
 
-        <!-- Another calendar card -->
-        <div class="col">
-          <div class="card shadow-sm h-100">
-            <div class="card-body">
-              <h5 class="card-title">Marketing Events</h5>
-              <p class="card-text">All key marketing campaign dates and events.</p>
-              <a href="#" class="btn btn-primary">View Calendar</a>
-            </div>
-          </div>
-        </div>
+        <?php
+
+        // Fetch calendar
+        $stmt = $pdo->prepare("SELECT * FROM calendars");
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($results):
+
+            foreach ($results as $row): ?>
+
+                <div class="col">
+
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><?php echo htmlspecialchars($row['title']); ?></h5>
+                            <p class="card-text"><?php echo htmlspecialchars($row['description']); ?></p>
+                            <a href="view_calendar.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Calendar</a>
+                        </div>
+                    </div>
+                </div>
+          <?php endforeach; ?>
+
+        <?php else: ?>
+            <p>No events found for this calendar.</p>
+          <?php endif; ?>
+
+
+
 
         <!-- Add more dynamic cards here -->
       </div>

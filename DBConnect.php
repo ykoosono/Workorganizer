@@ -1,89 +1,18 @@
-
 <?php
-$host = "localhost";
-$dbname2 = "workorganizer_db";
-$username2 = "root";
-$password2 = "";
+// Database credentials
+$host     = 'localhost';
+$username = 'root';        // Change if using a different user
+$password = '';            // Change if your MySQL user has a password
+$dbname   = 'workorganizer_db';
 
-// Create connection
-$conn2 = new mysqli($host, $username2, $password2, $dbname2);
+// Create the database connection
+$conn = new mysqli($host, $username, $password, $dbname);
 
-// Check connection
-if ($conn2->connect_error) {
-    die("Connection failed: " . $conn2->connect_error);
+// Check connection and handle errors
+if ($conn->connect_error) {
+    die("Database connection failed: " . $conn->connect_error);
 }
 
-$servername = "localhost";
-$username = "mahadev";
-$password = "mahadev";
-$dbname = "workorganizer_db";
-$conn;
-
-// Internal APIs 
-function openDB() {
-  global $servername, $username, $password, $dbname, $conn;
-
-// Create connection
-  $conn = new mysqli($servername, $username, $password, $dbname);
-  if ($conn->connect_error) {
-        return $conn->connect_error;
-    } else {
-        return "Connected";
-    }
-}
-
-function closeDB() {
-  global $conn;
-  $conn->close();
-}
-
-// API to modify DB
-function modifyDB($sql) {
-  global $conn;
-  $message = openDB();
-  if ($message == "Connected") {
-    if ($conn->query($sql) === TRUE)
-      $message = "Update Successful";
-    else
-      $message = $conn->error;
-    closeDB();
-  }
-  return $message . "<br>";
-}
-
-// API to query DB
-function queryDB($sql) { // returns an object or a string
-  global $conn;
-  $message = openDB();
-  if ($message == "Connected") {
-    $result = $conn->query($sql);
-    if (gettype($result) == "object") {
-            $message = $result;
-        } else {
-            $message = $conn->error . "<br>Your SQL:" . $sql;
-        }
-        closeDB();
-  }
-  return $message;
-}
-
-// API for login with prepared statement
-function loginDB($sql, $user, $pwd) {
-  global $conn;
-  $message = openDB();
-  if ($message == "Connected") {
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $user, $pwd);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if (gettype($result) == "object") {
-            $message = $result;
-        } else {
-            $message = $conn->error . "<br>Your SQL:" . $sql;
-        }
-        closeDB();
-  }
-  return $message;
-}
+// Optional: Set charset
+$conn->set_charset("utf8mb4");
 ?>
-
