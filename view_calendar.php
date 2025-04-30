@@ -1,9 +1,9 @@
 <?php include 'header.php'; ?>
 <?php
 $host = 'localhost';
-$db = 'workorganizer_db'; // ✅ corrected name
-$user = 'root'; // ← replace with your actual DB username
-$pass = ''; // ← replace with your actual DB password
+$db = 'workorganizer_db';
+$user = 'root';
+$pass = '';
 $pdo = null;
 try {
   $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
@@ -63,7 +63,10 @@ $events = $eventStmt->fetchAll(PDO::FETCH_ASSOC);
         <p>No events found for this calendar.</p>
       <?php endif; ?>
 
-      <a href="homepage.php" class="btn btn-secondary mt-4">Back to My Calendars</a>
+      <a href="homepage.php" class="btn btn-primary mt-4">Back to My Calendars</a>
+      <a href="edit-calendar.php" class="btn btn-warning mt-4">Edit  Calendar</a>
+      <a href="add-member.php" class="btn btn-success mt-4">Add Member</a>
+      <a href="remove-member.php" class="btn btn-danger mt-4">Remove Member</a>
     </div>
   </main>
 
