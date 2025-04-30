@@ -37,6 +37,8 @@ $day29 = $_GET["day29"];
 $day30 = $_GET["day30"];
 $day31 = $_GET["day31"];
 
+//$userID = (int) $_SESSION['user_id'];
+//$calendarID = queryDB("SELECT IDENT_CURRENT('calendar')");
 
 $sql = "insert into calendar values (0, '" . $title . "', '" . $month . "', '" . $year . "', '" . $day1 . "', '" . $day2 . "', '" . $day3 
         . "', '" . $day4 . "', '" . $day5 . "', '" . $day6 . "', '" . $day7 . "', '" . $day8 . "', '" . $day9 . "', '". $day10 . "', '" . $day11 . "', '" . $day12 . "', '" . $day13 
@@ -44,9 +46,9 @@ $sql = "insert into calendar values (0, '" . $title . "', '" . $month . "', '" .
         . $day23 . "', '" . $day24 . "', '" . $day25 . "', '" . $day26 . "', '" . $day27 . "', '" . $day28 . "', '" . $day29 . "', '" . $day30 . "', '" . $day31 . "')";
 
 //to-do second sql statement for the users_calendars table to assign the many-to-many relationship between users and calendars
-//$sql2 = "insert into users_calendars values (0, '" .  ."', '" . 
+//$sql2 = "insert into users_calendars values (0, '" . $userID . "', '" . $calendarID . "' , '". 1 . "')";
 
 echo modifyDB($sql) . "<br>Use back button to return";
-
+//echo modifyDB($sql2)
 ?>
 

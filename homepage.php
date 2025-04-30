@@ -66,7 +66,7 @@ if ($calendars->num_rows == 0) {
       <!-- Functional Buttons -->
       <div class="row mb-4 align-items-center">
         <div class="col-md-4 mb-2 mb-md-0">
-          <a href="create-calendar.html" class="btn btn-success w-100">
+          <a href="addCalendar.php" class="btn btn-success w-100">
             <i class="bi bi-plus-circle"></i> Add New Calendar
           </a>
         </div>
