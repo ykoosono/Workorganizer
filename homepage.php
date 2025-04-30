@@ -1,4 +1,5 @@
 <?php
+include 'header.php';
 include('DBConnect.php'); 
 session_start();
 
@@ -8,90 +9,115 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $userId = (int) $_SESSION['user_id'];
+$sort = $_GET['sort'] ?? 'default';
+$query = $_GET['query'] ?? '';
+$likeQuery = '%' . $query . '%';
 
-$stmt1 = $conn->prepare("SELECT c.calendar_name 
-                         FROM users_calendars uc 
-                         JOIN calendar c ON uc.calendar_id = c.id
-                         WHERE uc.user_id = ? AND uc.role_id = 1");
-$stmt1->bind_param("i", $userId);
-$stmt1->execute();
-$leadCalendars = $stmt1->get_result();
+$sortOptions = [
+    'alpha' => 'calendar_name ASC',
+    'recent' => 'start_date DESC',
+    'default' => 'id ASC',
+];
 
-$stmt2 = $conn->prepare("SELECT c.calendar_name 
-                         FROM users_calendars uc 
-                         JOIN calendar c ON uc.calendar_id = c.id
-                         WHERE uc.user_id = ? AND uc.role_id = 2");
-$stmt2->bind_param("i", $userId);
-$stmt2->execute();
-$memberCalendars = $stmt2->get_result();
+$orderBy = $sortOptions[$sort] ?? $sortOptions['default'];
 
-$stmt3 = $conn->prepare("SELECT c.calendar_name 
-                         FROM users_calendars uc 
-                         JOIN calendar c ON uc.calendar_id = c.id
-                         WHERE uc.user_id = ? AND uc.role_id = 3");
-$stmt3->bind_param("i", $userId);
-$stmt3->execute();
-$viewerCalendars = $stmt3->get_result();
+$sql = "
+    SELECT * FROM (
+        SELECT c.id, c.calendar_name, c.start_date, 'Lead' AS role_label
+        FROM users_calendars uc
+        JOIN calendar c ON uc.calendar_id = c.id
+        WHERE uc.user_id = ? AND uc.role_id = 1 AND c.calendar_name LIKE ?
 
+        UNION ALL
+
+        SELECT c.id, c.calendar_name, c.start_date, 'Member' AS role_label
+        FROM users_calendars uc
+        JOIN calendar c ON uc.calendar_id = c.id
+        WHERE uc.user_id = ? AND uc.role_id = 2 AND c.calendar_name LIKE ?
+
+        UNION ALL
+
+        SELECT c.id, c.calendar_name, c.start_date, 'Viewer' AS role_label
+        FROM users_calendars uc
+        JOIN calendar c ON uc.calendar_id = c.id
+        WHERE uc.user_id = ? AND uc.role_id = 3 AND c.calendar_name LIKE ?
+    ) AS all_calendars
+    ORDER BY $orderBy
+";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("isisis", $userId, $likeQuery, $userId, $likeQuery, $userId, $likeQuery);
+$stmt->execute();
+$calendars = $stmt->get_result();
+
+// Debugging step: Check the SQL query result.
+if ($calendars->num_rows == 0) {
+    echo "<p>No calendars found. Please check your data and query parameters.</p>";
+} else {
+    echo "<p>Calendars found: " . $calendars->num_rows . "</p>";
+}
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Home | WorkOrganizer</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</head>
-<body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="homepage.php">Home</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="mynavbar">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="addCalendar.php">New Calendar</a>
-        </li>
-      </ul>
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link btn btn-danger text-white px-3" href="signout.php">Sign Out</a>
-        </li>
-      </ul>
+
+<div class="d-flex flex-column min-vh-100">
+  <main class="flex-grow-1">
+    <div class="container mt-5">
+      <h2 class="mb-4">My Calendars</h2>
+
+      <!-- Functional Buttons -->
+      <div class="row mb-4 align-items-center">
+        <div class="col-md-4 mb-2 mb-md-0">
+          <a href="create-calendar.html" class="btn btn-success w-100">
+            <i class="bi bi-plus-circle"></i> Add New Calendar
+          </a>
+        </div>
+
+        <div class="col-md-4 mb-2 mb-md-0">
+          <div class="dropdown w-100">
+            <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Sort Calendars
+            </button>
+            <ul class="dropdown-menu w-100">
+              <li><a class="dropdown-item <?= $sort === 'default' ? 'active' : '' ?>" href="?sort=default&query=<?= urlencode($query) ?>">Default</a></li>
+              <li><a class="dropdown-item <?= $sort === 'recent' ? 'active' : '' ?>" href="?sort=recent&query=<?= urlencode($query) ?>">Most Recent</a></li>
+              <li><a class="dropdown-item <?= $sort === 'alpha' ? 'active' : '' ?>" href="?sort=alpha&query=<?= urlencode($query) ?>">Alphabetically</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <form class="d-flex" action="" method="get">
+            <input class="form-control me-2" type="search" name="query" placeholder="Search calendars..." value="<?= htmlspecialchars($query) ?>" aria-label="Search">
+            <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
+            <button class="btn btn-primary" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Calendars grid -->
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <?php
+        function renderCalendarCard($calendarId, $calendarName, $roleLabel) {
+            echo '
+            <div class="col">
+              <div class="card shadow-sm h-100">
+                <div class="card-body">
+                  <h5 class="card-title">'.htmlspecialchars($calendarName).'</h5>
+                  <p class="card-text">Role: '.htmlspecialchars($roleLabel).'</p>
+                  <a href="view-calendar.php?id=' . urlencode($calendarId) . '" class="btn btn-primary">View Calendar</a>
+                </div>
+              </div>
+            </div>';
+        }
+
+        // Loop through the result set and render the cards
+        while ($row = $calendars->fetch_assoc()) {
+            renderCalendarCard($row['id'], $row['calendar_name'], $row['role_label']);
+        }
+        ?>
+      </div>
     </div>
-  </div>
-</nav>
+  </main>
 
-<div class="container mt-5">
-  <h1>Your Calendars</h1>
-
-  <h3>Lead Calendars</h3>
-  <ul>
-    <?php while ($row = $leadCalendars->fetch_assoc()): ?>
-      <li><?php echo htmlspecialchars($row['calendar_name']); ?></li>
-    <?php endwhile; ?>
-  </ul>
-
-  <h3>Member Calendars</h3>
-  <ul>
-    <?php while ($row = $memberCalendars->fetch_assoc()): ?>
-      <li><?php echo htmlspecialchars($row['calendar_name']); ?></li>
-    <?php endwhile; ?>
-  </ul>
-
-  <h3>Viewer Calendars</h3>
-    <ul>
-    <?php while ($row = $viewerCalendars->fetch_assoc()): ?>
-      <li><?php echo htmlspecialchars($row['calendar_name']); ?></li>
-    <?php endwhile; ?>
-  </ul>
+  <?php include 'footer.php'; ?>
 </div>
 
-<footer class="text-center mt-5 p-3 bg-light">
-  <p>&copy; 2025 WorkOrganizer. All rights reserved.</p>
-</footer>
-</body>
-</html>
