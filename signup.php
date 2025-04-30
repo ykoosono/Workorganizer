@@ -7,15 +7,9 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <?php include 'header.php' ?>
 </head>
 <body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
-
-  <!-- Header -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="homepage.php">WorkOrganizer</a>
-    </div>
-  </nav>
 
   <!-- Sign Up Form -->
   <div class="container my-5">
@@ -69,10 +63,7 @@
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="text-center mt-5 p-3 bg-light">
-    <p>&copy; 2025 WorkOrganizer. All rights reserved.</p>
-  </footer>
+    <?php include 'footer.php' ?>
 
   <!-- Bootstrap validation script -->
   <script>

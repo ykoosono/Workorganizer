@@ -8,7 +8,7 @@
       <!-- Functional Buttons -->
       <div class="row mb-4 align-items-center">
         <div class="col-md-4 mb-2 mb-md-0">
-          <a href="create-calendar.html" class="btn btn-success w-100">
+          <a href="addCalendar.php" class="btn btn-success w-100">
             <i class="bi bi-plus-circle"></i> Add New Calendar
           </a>
         </div>
@@ -41,7 +41,7 @@
             <div class="card-body">
               <h5 class="card-title">Team Project Calendar</h5>
               <p class="card-text">Track milestones and deadlines for our current project.</p>
-              <a href="#" class="btn btn-primary">View Calendar</a>
+              <a href="editCalendar.php" class="btn btn-primary">View Calendar</a>
             </div>
           </div>
         </div>
