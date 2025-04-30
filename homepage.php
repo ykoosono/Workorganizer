@@ -1,4 +1,62 @@
-<?php include 'header.php'; ?>
+<?php
+include 'header.php';
+include('DBConnect.php'); 
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$userId = (int) $_SESSION['user_id'];
+$sort = $_GET['sort'] ?? 'default';
+$query = $_GET['query'] ?? '';
+$likeQuery = '%' . $query . '%';
+
+$sortOptions = [
+    'alpha' => 'calendar_name ASC',
+    'recent' => 'start_date DESC',
+    'default' => 'id ASC',
+];
+
+$orderBy = $sortOptions[$sort] ?? $sortOptions['default'];
+
+$sql = "
+    SELECT * FROM (
+        SELECT c.id, c.calendar_name, c.start_date, 'Lead' AS role_label
+        FROM users_calendars uc
+        JOIN calendar c ON uc.calendar_id = c.id
+        WHERE uc.user_id = ? AND uc.role_id = 1 AND c.calendar_name LIKE ?
+
+        UNION ALL
+
+        SELECT c.id, c.calendar_name, c.start_date, 'Member' AS role_label
+        FROM users_calendars uc
+        JOIN calendar c ON uc.calendar_id = c.id
+        WHERE uc.user_id = ? AND uc.role_id = 2 AND c.calendar_name LIKE ?
+
+        UNION ALL
+
+        SELECT c.id, c.calendar_name, c.start_date, 'Viewer' AS role_label
+        FROM users_calendars uc
+        JOIN calendar c ON uc.calendar_id = c.id
+        WHERE uc.user_id = ? AND uc.role_id = 3 AND c.calendar_name LIKE ?
+    ) AS all_calendars
+    ORDER BY $orderBy
+";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("isisis", $userId, $likeQuery, $userId, $likeQuery, $userId, $likeQuery);
+$stmt->execute();
+$calendars = $stmt->get_result();
+
+// Debugging step: Check the SQL query result.
+if ($calendars->num_rows == 0) {
+    echo "<p>No calendars found. Please check your data and query parameters.</p>";
+} else {
+    echo "<p>Calendars found: " . $calendars->num_rows . "</p>";
+}
+?>
 
 <div class="d-flex flex-column min-vh-100">
   <main class="flex-grow-1">
@@ -19,15 +77,17 @@
               Sort Calendars
             </button>
             <ul class="dropdown-menu w-100">
-              <li><a class="dropdown-item" href="?sort=recent">Most Recent</a></li>
-              <li><a class="dropdown-item" href="?sort=alpha">Alphabetically</a></li>
+              <li><a class="dropdown-item <?= $sort === 'default' ? 'active' : '' ?>" href="?sort=default&query=<?= urlencode($query) ?>">Default</a></li>
+              <li><a class="dropdown-item <?= $sort === 'recent' ? 'active' : '' ?>" href="?sort=recent&query=<?= urlencode($query) ?>">Most Recent</a></li>
+              <li><a class="dropdown-item <?= $sort === 'alpha' ? 'active' : '' ?>" href="?sort=alpha&query=<?= urlencode($query) ?>">Alphabetically</a></li>
             </ul>
           </div>
         </div>
 
         <div class="col-md-4">
-          <form class="d-flex" action="search-calendars.php" method="get">
-            <input class="form-control me-2" type="search" name="query" placeholder="Search calendars..." aria-label="Search">
+          <form class="d-flex" action="" method="get">
+            <input class="form-control me-2" type="search" name="query" placeholder="Search calendars..." value="<?= htmlspecialchars($query) ?>" aria-label="Search">
+            <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
             <button class="btn btn-primary" type="submit">Search</button>
           </form>
         </div>
@@ -35,29 +95,25 @@
 
       <!-- Calendars grid -->
       <div class="row row-cols-1 row-cols-md-3 g-4">
-        <!-- Example calendar card -->
-        <div class="col">
-          <div class="card shadow-sm h-100">
-            <div class="card-body">
-              <h5 class="card-title">Team Project Calendar</h5>
-              <p class="card-text">Track milestones and deadlines for our current project.</p>
-              <a href="editCalendar.php" class="btn btn-primary">View Calendar</a>
-            </div>
-          </div>
-        </div>
+        <?php
+        function renderCalendarCard($calendarId, $calendarName, $roleLabel) {
+            echo '
+            <div class="col">
+              <div class="card shadow-sm h-100">
+                <div class="card-body">
+                  <h5 class="card-title">'.htmlspecialchars($calendarName).'</h5>
+                  <p class="card-text">Role: '.htmlspecialchars($roleLabel).'</p>
+                  <a href="view-calendar.php?id=' . urlencode($calendarId) . '" class="btn btn-primary">View Calendar</a>
+                </div>
+              </div>
+            </div>';
+        }
 
-        <!-- Another calendar card -->
-        <div class="col">
-          <div class="card shadow-sm h-100">
-            <div class="card-body">
-              <h5 class="card-title">Marketing Events</h5>
-              <p class="card-text">All key marketing campaign dates and events.</p>
-              <a href="#" class="btn btn-primary">View Calendar</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Add more dynamic cards here -->
+        // Loop through the result set and render the cards
+        while ($row = $calendars->fetch_assoc()) {
+            renderCalendarCard($row['id'], $row['calendar_name'], $row['role_label']);
+        }
+        ?>
       </div>
     </div>
   </main>
