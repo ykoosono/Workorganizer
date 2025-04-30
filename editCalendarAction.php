@@ -37,6 +37,9 @@ $day29 = $_GET["day29"];
 $day30 = $_GET["day30"];
 $day31 = $_GET["day31"];
 
+//populate fields with info to be edited from database
+
+
 $userID;
 $calendarID;
 
