@@ -1,10 +1,14 @@
+-- Create Database
+CREATE DATABASE IF NOT EXISTS workorganizer_db;
+USE workorganizer_db;
+
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
 
--- Generation Time: Apr 23, 2025 at 05:47 PM
+-- Generation Time: Mar 03, 2025 at 05:57 PM
 
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
@@ -13,11 +17,10 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT;
+SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS;
+SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION;
+SET NAMES utf8mb4;
 
 --
 -- Database: `workorganizer_db`
@@ -85,8 +88,9 @@ INSERT INTO `calendar` (`id`, `title`, `month`, `year`, `1st`, `2nd`, `3rd`, `4t
 --
 
 CREATE TABLE `permissions` (
-  `id` int(11) NOT NULL,
-  `permission_name` varchar(50) NOT NULL
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `permission_name` varchar(50) NOT NULL UNIQUE,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -94,11 +98,11 @@ CREATE TABLE `permissions` (
 --
 
 INSERT INTO `permissions` (`id`, `permission_name`) VALUES
+(1, 'View Project'),
+(2, 'Edit Project'),
 (3, 'Add Team Members'),
 (4, 'Assign Tasks'),
-(2, 'Edit Project'),
-(5, 'View Only Access'),
-(1, 'View Project');
+(5, 'View Only Access');
 
 -- --------------------------------------------------------
 
@@ -107,8 +111,9 @@ INSERT INTO `permissions` (`id`, `permission_name`) VALUES
 --
 
 CREATE TABLE `roles` (
-  `id` int(11) NOT NULL,
-  `role_name` varchar(50) NOT NULL
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_name` varchar(50) NOT NULL UNIQUE,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -127,9 +132,12 @@ INSERT INTO `roles` (`id`, `role_name`) VALUES
 --
 
 CREATE TABLE `role_permissions` (
-  `id` int(3) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `role_id` int(11) NOT NULL,
-  `permission_id` int(11) NOT NULL
+  `permission_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -152,9 +160,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `permission_id`) VALUES
 --
 
 CREATE TABLE `users` (
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL UNIQUE,
   `password` varchar(255) NOT NULL,
 
   `created_at` timestamp NULL DEFAULT current_timestamp()
@@ -206,12 +214,6 @@ ALTER TABLE `permissions`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `permission_name` (`permission_name`);
 
---
--- Indexes for table `roles`
---
-ALTER TABLE `roles`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `role_name` (`role_name`);
 
 --
 -- Indexes for table `role_permissions`
