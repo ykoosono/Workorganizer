@@ -7,26 +7,44 @@ $username = "root";
 $password = "";
 
 $conn = new mysqli($host, $username, $password, $dbname);
-if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$login_error = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = $_POST['email'];
-    $password = $_POST['password'];
+    $password_input = $_POST['password'];
 
-    $query = "SELECT * FROM users WHERE email = ? AND password = ?";
+    $query = "SELECT user_id, name, email, password FROM users WHERE email = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ss", $email, $password);
-    $stmt->execute();
-    $stmt->store_result();
 
-    if ($stmt->num_rows > 0) {
-        $_SESSION['logged_in'] = true;
-        header("Location: homepage.php");
-        exit();
-    } else {
-        $login_error = "Invalid email or password.";
+    if ($stmt) {
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $stmt->bind_result($user_id, $name, $email_db, $password_db);
+            $stmt->fetch();
+
+            if ($password_input === $password_db) {
+                $_SESSION['logged_in'] = true;
+                $_SESSION['user_id'] = $user_id;
+                $_SESSION['name'] = $name;
+
+                header("Location: homepage.php");
+                exit();
+            } else {
+                $login_error = "Invalid email or password.";
+            }
+        } else {
+            $login_error = "Invalid email or password.";
+        }
+
+        $stmt->close();
     }
-    $stmt->close();
 }
 ?>
 <!DOCTYPE html>
@@ -38,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-<body style="background: linear-gradient(135deg, #c1d3df, #a7bbc7); min-height: 100vh;">
+<body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
 
   <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid">
