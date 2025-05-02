@@ -29,13 +29,15 @@ if (!$calendar) {
   exit;
 }
 
-// Delete task if requested
-if (isset($_GET['delete_event']) && is_numeric($_GET['delete_event'])) {
-  $deleteId = $_GET['delete_event'];
-  $pdo->prepare("DELETE FROM events WHERE id = ? AND calendar_id = ?")->execute([$deleteId, $calendarId]);
-  header("Location: view-calendar.php?id=$calendarId");
-  exit;
-}
+// Fetch incomplete tasks
+$incompleteStmt = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 0 ORDER BY date ASC");
+$incompleteStmt->execute([$calendarId]);
+$incompleteEvents = $incompleteStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch complete tasks
+$completeStmt = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 1 ORDER BY date ASC");
+$completeStmt->execute([$calendarId]);
+$completeEvents = $completeStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Add or edit event
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -59,11 +61,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   }
 }
 
-// Fetch events
-$eventStmt = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? ORDER BY date ASC");
-$eventStmt->execute([$calendarId]);
-$events = $eventStmt->fetchAll(PDO::FETCH_ASSOC);
-
 // Editing specific event
 $editingEvent = null;
 if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
@@ -81,11 +78,12 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
       <p class="text-muted"><?php echo htmlspecialchars($calendar['description']); ?></p>
 
       <hr>
-      <h4 class="mb-3">Events</h4>
 
-      <?php if ($events): ?>
+      <!-- Incomplete Tasks -->
+      <h4 class="mb-3">Incomplete Tasks</h4>
+      <?php if ($incompleteEvents): ?>
         <ul class="list-group mb-4">
-          <?php foreach ($events as $event): ?>
+          <?php foreach ($incompleteEvents as $event): ?>
             <li class="list-group-item d-flex justify-content-between align-items-start">
               <div>
                 <h5 class="mb-1"><?php echo htmlspecialchars($event['title']); ?></h5>
@@ -93,6 +91,11 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
                 <p class="mb-1"><?php echo htmlspecialchars($event['details']); ?></p>
               </div>
               <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-success toggle-complete"
+                        data-event-id="<?php echo $event['id']; ?>"
+                        data-status="1">
+                  Mark Complete
+                </button>
                 <a href="?id=<?php echo $calendarId; ?>&edit_event=<?php echo $event['id']; ?>" class="btn btn-outline-primary">Edit</a>
                 <a href="?id=<?php echo $calendarId; ?>&delete_event=<?php echo $event['id']; ?>" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this event?');">Delete</a>
               </div>
@@ -100,7 +103,36 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
           <?php endforeach; ?>
         </ul>
       <?php else: ?>
-        <p>No events found for this calendar.</p>
+        <p>No incomplete tasks found for this calendar.</p>
+      <?php endif; ?>
+
+      <hr>
+
+      <!-- Complete Tasks -->
+      <h4 class="mb-3">Complete Tasks</h4>
+      <?php if ($completeEvents): ?>
+        <ul class="list-group mb-4">
+          <?php foreach ($completeEvents as $event): ?>
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+              <div>
+                <h5 class="mb-1"><?php echo htmlspecialchars($event['title']); ?></h5>
+                <small class="text-muted"><?php echo htmlspecialchars($event['date']); ?></small>
+                <p class="mb-1"><?php echo htmlspecialchars($event['details']); ?></p>
+              </div>
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-secondary toggle-complete"
+                        data-event-id="<?php echo $event['id']; ?>"
+                        data-status="0">
+                  Mark Incomplete
+                </button>
+                <a href="?id=<?php echo $calendarId; ?>&edit_event=<?php echo $event['id']; ?>" class="btn btn-outline-primary">Edit</a>
+                <a href="?id=<?php echo $calendarId; ?>&delete_event=<?php echo $event['id']; ?>" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this event?');">Delete</a>
+              </div>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php else: ?>
+        <p>No complete tasks found for this calendar.</p>
       <?php endif; ?>
 
       <!-- Add/Edit Task Form -->
@@ -139,3 +171,30 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
   </main>
   <?php include 'footer.php'; ?>
 </div>
+
+<!-- AJAX Script for Toggle Completion -->
+<script>
+document.querySelectorAll('.toggle-complete').forEach(button => {
+  button.addEventListener('click', function () {
+    const eventId = this.getAttribute('data-event-id');
+    const status = this.getAttribute('data-status');
+
+    fetch('toggle-completion.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `event_id=${eventId}&is_complete=${status}`
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload(); // Refresh the page to reflect changes
+      } else {
+        alert('Error updating task.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  });
+});
+</script>
