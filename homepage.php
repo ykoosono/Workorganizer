@@ -58,6 +58,7 @@ if ($calendars->num_rows == 0) {
 }
 ?>
 
+
 <div class="d-flex flex-column min-vh-100">
   <main class="flex-grow-1">
     <div class="container mt-5">

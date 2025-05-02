@@ -13,6 +13,7 @@
         <div class="container fluid">
             <h1>Add Calendar</h1>
             
+
             <form name="addCalendar" action="addCalendarAction.php" class="was-validated">
                 <div class="row">
                     <div class="col-md-3"></div>
@@ -257,4 +258,5 @@
         <?php include 'footer.php' ?>
     </body>
 </html>
+
 

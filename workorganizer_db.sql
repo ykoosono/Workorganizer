@@ -1,4 +1,3 @@
--- Create Database
 CREATE DATABASE IF NOT EXISTS workorganizer_db;
 USE workorganizer_db;
 
@@ -88,14 +87,10 @@ INSERT INTO `calendar` (`id`, `title`, `month`, `year`, `1st`, `2nd`, `3rd`, `4t
 --
 
 CREATE TABLE `permissions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `permission_name` varchar(50) NOT NULL UNIQUE,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `permission_name` VARCHAR(50) NOT NULL UNIQUE,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `permissions`
---
+);
 
 INSERT INTO `permissions` (`id`, `permission_name`) VALUES
 (1, 'View Project'),
@@ -104,45 +99,25 @@ INSERT INTO `permissions` (`id`, `permission_name`) VALUES
 (4, 'Assign Tasks'),
 (5, 'View Only Access');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `roles`
---
-
 CREATE TABLE `roles` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `role_name` varchar(50) NOT NULL UNIQUE,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `role_name` VARCHAR(50) NOT NULL UNIQUE,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `roles`
---
+);
 
 INSERT INTO `roles` (`id`, `role_name`) VALUES
 (1, 'Lead Member'),
 (2, 'Team Member'),
 (3, 'View-Only Member');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `role_permissions`
---
-
 CREATE TABLE `role_permissions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `role_id` int(11) NOT NULL,
-  `permission_id` int(11) NOT NULL,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `role_id` INT(11) NOT NULL,
+  `permission_id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
   FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `role_permissions`
---
+);
 
 INSERT INTO `role_permissions` (`id`, `role_id`, `permission_id`) VALUES
 (1, 1, 1),
@@ -152,12 +127,6 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `permission_id`) VALUES
 (5, 2, 1),
 (6, 2, 2),
 (7, 3, 1);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
 
 CREATE TABLE `users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -173,25 +142,30 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
+
 INSERT INTO `users` (`user_id`, `name`, `email`, `password`, `created_at`) VALUES
 (1, 'clacombe', 'clacombe@fitchburg.edu', 'clacombe', '0000-00-00 00:00:00'),
 (14, 'calacombe', 'calacombe@fitchburg.edu', 'clacombe', '2025-03-26 02:10:36'),
 (16, 'mahadev', 'abc@123.com', 'clacombe', '2025-03-26 15:50:12'),
 (18, 'alacombe', 'clacombe@fitchburgstate.edu', 'clacombe', '2025-04-07 15:17:53');
 
--- --------------------------------------------------------
 
---
--- Table structure for table `users_calendars`
---
+CREATE TABLE IF NOT EXISTS calendars (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  user_id INT DEFAULT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE `users_calendars` (
   `id` int(3) NOT NULL,
   `calendar_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL,
+
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`calendar_id`) REFERENCES `calendar` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`calendar_id`) REFERENCES `calendars` (`id`) ON DELETE CASCADE,
   FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
