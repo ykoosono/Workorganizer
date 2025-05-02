@@ -1,79 +1,83 @@
 <?php
 session_start();
 
-$host = "localhost";
-$dbname = "workorganizer_db";
-$username = "root";
-$password = "";
+$host = 'localhost';
+$db = 'workorganizer_db';
+$user = 'root';
+$pass = '';
+$pdo = null;
 
-$conn = new mysqli($host, $username, $password, $dbname);
-if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+$errors = [];
+$email = '';
 
-    $query = "SELECT * FROM users WHERE email = ? AND password = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("ss", $email, $password);
-    $stmt->execute();
-    $stmt->store_result();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
 
-    if ($stmt->num_rows > 0) {
-        $_SESSION['logged_in'] = true;
-        header("Location: homepage.php");
-        exit();
+    if (!$email || !$password) {
+        $errors[] = "Email and password are required.";
     } else {
-        $login_error = "Invalid email or password.";
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && password_verify($password, $user['password'])) {
+            // Set session and redirect to homepage
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['name'] = $user['name'];
+            $_SESSION['email'] = $user['email'];
+            header('Location: homepage.php');
+            exit;
+        } else {
+            $errors[] = "Invalid email or password.";
+        }
     }
-    $stmt->close();
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login | WorkOrganizer</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</head>
-<body style="background: linear-gradient(135deg, #c1d3df, #a7bbc7); min-height: 100vh;">
 
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="homepage.php">WorkOrganizer</a>
-    </div>
-  </nav>
+<?php include 'header.php'; ?>
+<body class="d-flex flex-column min-vh-100">
+  <main class="flex-grow-1">
+    <!-- your login form -->
+  </main>
 
-  <div class="container my-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6 col-lg-5">
-        <div class="card p-4 shadow-lg rounded">
-          <h2 class="text-center mb-4">Login</h2>
-          <?php if (!empty($login_error)) echo "<div class='alert alert-danger'>$login_error</div>"; ?>
-          <form method="POST" action="login.php">
-            <div class="mb-3">
-              <label for="email" class="form-label">Email Address</label>
-              <input type="email" name="email" id="email" class="form-control" required />
-            </div>
-            <div class="mb-3">
-              <label for="password" class="form-label">Password</label>
-              <input type="password" name="password" id="password" class="form-control" required />
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
-          </form>
-          <div class="mt-3 text-center">
-            <p>Not a member? <a href="signup.php">Sign up</a></p>
-            <a href="forgot_password.php">Forgot password?</a>
-          </div>
+</body>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <h2>Login</h2>
+      <?php if (isset($_GET['registered'])): ?>
+        <div class="alert alert-success">Registration successful. You can now log in.</div>
+      <?php endif; ?>
+      <?php if (!empty($errors)): ?>
+        <div class="alert alert-danger">
+          <?php foreach ($errors as $error): ?>
+            <div><?php echo htmlspecialchars($error); ?></div>
+          <?php endforeach; ?>
         </div>
-      </div>
+      <?php endif; ?>
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label">Email Address</label>
+          <input type="email" name="email" class="form-control" value="<?php echo htmlspecialchars($email); ?>" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+        <a href="signup.php" class="btn btn-link">Don't have an account? Sign up</a>
+      </form>
     </div>
   </div>
+</div>
 
-  <footer class="text-center mt-5 p-3 bg-light">
-    <p>&copy; 2025 WorkOrganizer. All rights reserved.</p>
-  </footer>
-</body>
-</html>
+<?php include 'footer.php'; ?>

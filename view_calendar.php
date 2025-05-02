@@ -1,10 +1,12 @@
 <?php include 'header.php'; ?>
+
 <?php
 $host = 'localhost';
 $db = 'workorganizer_db';
 $user = 'root';
 $pass = '';
 $pdo = null;
+
 try {
   $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -162,6 +164,7 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
 
       <!-- Navigation -->
       <div class="mt-4">
+        <!-- Edit Calendar Button (Functional) -->
         <a href="homepage.php" class="btn btn-primary">Back to My Calendars</a>
         <a href="edit-calendar.php?id=<?php echo $calendarId; ?>" class="btn btn-warning">Edit Calendar</a>
         <a href="add-member.php?id=<?php echo $calendarId; ?>" class="btn btn-success">Add Member</a>

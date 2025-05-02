@@ -1,11 +1,12 @@
-
-<?php include 'header.php'; ?>
 <?php
+include 'header.php';
+
 $host = 'localhost';
 $db = 'workorganizer_db'; // ✅ corrected name
 $user = 'root'; // ← replace with your actual DB username
 $pass = ''; // ← replace with your actual DB password
 $pdo = null;
+
 try {
   $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -13,7 +14,6 @@ try {
   die("Database connection failed: " . $e->getMessage());
 }
 ?>
-
 
 <div class="d-flex flex-column min-vh-100">
   <main class="flex-grow-1">
@@ -50,39 +50,31 @@ try {
 
       <!-- Calendars grid -->
       <div class="row row-cols-1 row-cols-md-3 g-4">
-        <!-- Example calendar card -->
-
         <?php
-
         // Fetch calendar
         $stmt = $pdo->prepare("SELECT * FROM calendars");
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if ($results):
-
-            foreach ($results as $row): ?>
-
+            foreach ($results as $row):
+        ?>
                 <div class="col">
-
                     <div class="card shadow-sm h-100">
                         <div class="card-body">
                             <h5 class="card-title"><?php echo htmlspecialchars($row['title']); ?></h5>
                             <p class="card-text"><?php echo htmlspecialchars($row['description']); ?></p>
+                            <!-- Ensure the link goes to view_calendar.php with the correct calendar ID -->
                             <a href="view_calendar.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Calendar</a>
                         </div>
                     </div>
                 </div>
-          <?php endforeach; ?>
-
-        <?php else: ?>
-            <p>No events found for this calendar.</p>
-          <?php endif; ?>
-
-
-
-
-        <!-- Add more dynamic cards here -->
+        <?php
+            endforeach;
+        else:
+        ?>
+            <p>No calendars found.</p>
+        <?php endif; ?>
       </div>
     </div>
   </main>
