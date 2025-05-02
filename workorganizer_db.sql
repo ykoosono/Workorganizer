@@ -1,15 +1,9 @@
--- Create Database
-CREATE DATABASE IF NOT EXISTS workorganizer_db;
-USE workorganizer_db;
-
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
-
--- Generation Time: Mar 03, 2025 at 05:57 PM
-
+-- Generation Time: May 03, 2025 at 12:37 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -17,10 +11,11 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT;
-SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS;
-SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION;
-SET NAMES utf8mb4;
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `workorganizer_db`
@@ -35,51 +30,56 @@ SET NAMES utf8mb4;
 CREATE TABLE `calendar` (
   `id` int(11) NOT NULL,
   `title` varchar(100) NOT NULL,
+  `description` text NOT NULL,
   `month` varchar(11) NOT NULL,
-  `year` year(4) NOT NULL,
-  `1st` varchar(255) NOT NULL,
-  `2nd` varchar(255) NOT NULL,
-  `3rd` varchar(255) NOT NULL,
-  `4th` varchar(255) NOT NULL,
-  `5th` varchar(255) NOT NULL,
-  `6th` varchar(255) NOT NULL,
-  `7th` varchar(255) NOT NULL,
-  `8th` varchar(255) NOT NULL,
-  `9th` varchar(255) NOT NULL,
-  `10th` varchar(255) NOT NULL,
-  `11th` varchar(255) NOT NULL,
-  `12th` varchar(255) NOT NULL,
-  `13th` varchar(255) NOT NULL,
-  `14th` varchar(255) NOT NULL,
-  `15th` varchar(255) NOT NULL,
-  `16th` varchar(255) NOT NULL,
-  `17th` varchar(255) NOT NULL,
-  `18th` varchar(255) NOT NULL,
-  `19th` varchar(255) NOT NULL,
-  `20th` varchar(255) NOT NULL,
-  `21st` varchar(255) NOT NULL,
-  `22nd` varchar(255) NOT NULL,
-  `23rd` varchar(255) NOT NULL,
-  `24th` varchar(255) NOT NULL,
-  `25th` varchar(255) NOT NULL,
-  `26th` varchar(255) NOT NULL,
-  `27th` varchar(255) NOT NULL,
-  `28th` varchar(255) NOT NULL,
-  `29th` varchar(255) NOT NULL,
-  `30th` varchar(255) NOT NULL,
-  `31st` varchar(255) NOT NULL
-
+  `year` year(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `calendar`
 --
 
-INSERT INTO `calendar` (`id`, `title`, `month`, `year`, `1st`, `2nd`, `3rd`, `4th`, `5th`, `6th`, `7th`, `8th`, `9th`, `10th`, `11th`, `12th`, `13th`, `14th`, `15th`, `16th`, `17th`, `18th`, `19th`, `20th`, `21st`, `22nd`, `23rd`, `24th`, `25th`, `26th`, `27th`, `28th`, `29th`, `30th`, `31st`) VALUES
-(1, 'Test Calend', 'March', '2025', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th', '15th', '16th', '17th', '18th', '19th', '20th', '21st', '22nd', '23rd', '24th', '25th', '26th', '27th', '28th', '29th', '30th', '31st'),
-(2, 'Test Calendar', 'February', '2025', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th', '15th', '16th', '17th', '18th', '19th', '20th', '21st', '22nd', '23rd', '24th', '25th', '26th', '27th', '28th', 'non-applicable', 'non-applicable', 'non-applicable'),
-(3, 'Test Calendar', 'February', '2025', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th', '15th', '16th', '17th', '18th', '19th', '20th', '21st', '22nd', '23rd', '24th', '25th', '26th', '27th', '28th', '', '', ''),
-(4, 'Test Calendar 2', 'April', '2025', '1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th', '11th', '12th', '13th', '14th', '15th', '16th', '17th', '18th', '19th', '20th', '21st', '22nd', '23rd', '24th', '25th', '26th', '27th', '28th', '29th', '30th', 'non-applicable');
+INSERT INTO `calendar` (`id`, `title`, `description`, `month`, `year`) VALUES
+(1, 'Test Calend', '', 'March', '2025'),
+(2, 'Test Calendar', '', 'February', '2025'),
+(3, 'Test Calendar', '', 'February', '2025'),
+(4, 'Test Calendar 2', '', 'April', '2025'),
+(5, 'Test Calendar 3', 'Test Calendar', 'April', '2025'),
+(6, 'Test Calendar 4', 'Test Calendar', 'December', '2020'),
+(7, 'Test Calendar 5', 'Test Calendar', 'April', '2025'),
+(8, 'Test Calendar 6', 'Test Calendar', 'March', '2025'),
+(9, 'Test Calendar 7', 'Test Calendar', 'December', '2020'),
+(10, 'Test Calendar 8', 'Test Calendar', 'March', '2025'),
+(11, 'Test Calendar 8', 'Test Calendar', 'March', '2020'),
+(12, 'Test Calendar 9', 'Test Calendar', 'March', '2025'),
+(13, 'Test Calendar 8', 'Test Calendar', 'March', '2020'),
+(14, 'Test Calendar 8', 'Test Calendar', 'March', '2025'),
+(15, 'Test Calendar 7', 'Test Calendar', 'December', '2020'),
+(16, 'Test Calendar 6', 'Test Calendar', 'March', '2025'),
+(17, 'Test Calendar 6', 'Test Calendar', 'March', '2025'),
+(18, 'Test Calendar 9', 'Test Calendar', 'March', '2025'),
+(19, 'Test Calendar 1', 'Test Calendar', 'March', '2025'),
+(20, 'Test Calendar 10', 'Test Calendar', 'December', '2020'),
+(21, 'Test Calendar 11', 'Test Calendar', 'December', '2025'),
+(22, 'Test Calendar 12', 'Test Calendar', 'March', '2025'),
+(23, 'Test Calendar 13', 'Test Calendar', 'April', '2020'),
+(24, 'Test Calendar 21', 'Test Calendar', 'April', '2020'),
+(25, 'Test Calendar 22', 'Test Calendar', 'December', '2025'),
+(26, 'Test Calendar 24', 'Test Calendar Update', 'July', '2024');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `events`
+--
+
+CREATE TABLE `events` (
+  `event_id` int(11) NOT NULL,
+  `calendar_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `date` date NOT NULL,
+  `details` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -88,9 +88,8 @@ INSERT INTO `calendar` (`id`, `title`, `month`, `year`, `1st`, `2nd`, `3rd`, `4t
 --
 
 CREATE TABLE `permissions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `permission_name` varchar(50) NOT NULL UNIQUE,
-  PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL,
+  `permission_name` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -98,11 +97,11 @@ CREATE TABLE `permissions` (
 --
 
 INSERT INTO `permissions` (`id`, `permission_name`) VALUES
-(1, 'View Project'),
-(2, 'Edit Project'),
 (3, 'Add Team Members'),
 (4, 'Assign Tasks'),
-(5, 'View Only Access');
+(2, 'Edit Project'),
+(5, 'View Only Access'),
+(1, 'View Project');
 
 -- --------------------------------------------------------
 
@@ -111,9 +110,8 @@ INSERT INTO `permissions` (`id`, `permission_name`) VALUES
 --
 
 CREATE TABLE `roles` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `role_name` varchar(50) NOT NULL UNIQUE,
-  PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL,
+  `role_name` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -132,12 +130,9 @@ INSERT INTO `roles` (`id`, `role_name`) VALUES
 --
 
 CREATE TABLE `role_permissions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(3) NOT NULL,
   `role_id` int(11) NOT NULL,
-  `permission_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE
+  `permission_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -160,13 +155,11 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `permission_id`) VALUES
 --
 
 CREATE TABLE `users` (
-  `user_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL UNIQUE,
+  `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
-
   `created_at` timestamp NULL DEFAULT current_timestamp()
-
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -189,13 +182,16 @@ CREATE TABLE `users_calendars` (
   `id` int(3) NOT NULL,
   `calendar_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `role_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`calendar_id`) REFERENCES `calendar` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
+  `role_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `users_calendars`
+--
+
+INSERT INTO `users_calendars` (`id`, `calendar_id`, `user_id`, `role_id`) VALUES
+(16, 1, 18, 1),
+(17, 26, 1, 1);
 
 --
 -- Indexes for dumped tables
@@ -208,12 +204,25 @@ ALTER TABLE `calendar`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `events`
+--
+ALTER TABLE `events`
+  ADD PRIMARY KEY (`event_id`),
+  ADD KEY `calendar_id` (`calendar_id`);
+
+--
 -- Indexes for table `permissions`
 --
 ALTER TABLE `permissions`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `permission_name` (`permission_name`);
 
+--
+-- Indexes for table `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `role_name` (`role_name`);
 
 --
 -- Indexes for table `role_permissions`
@@ -248,7 +257,13 @@ ALTER TABLE `users_calendars`
 -- AUTO_INCREMENT for table `calendar`
 --
 ALTER TABLE `calendar`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT for table `events`
+--
+ALTER TABLE `events`
+  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -278,7 +293,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users_calendars`
 --
 ALTER TABLE `users_calendars`
-  MODIFY `id` int(3) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Constraints for dumped tables
@@ -303,4 +318,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
