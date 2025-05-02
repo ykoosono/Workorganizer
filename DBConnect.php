@@ -51,6 +51,29 @@ function modifyDB($sql) {
   return $message . "<br>";
 }
 
+//API to modify and get last id 
+function modifyReturnIDDB($sql, $sql2) { // returns an object or a string
+  global $conn;
+  $message = openDB();
+  if ($message == "Connected") 
+  {
+      if ($conn->query($sql) === TRUE) {
+        $result = $conn->query($sql2);
+        if (gettype($result) == "object") 
+        {
+            $message = $result;
+        } 
+        else {
+            $message = $conn->error . "<br>Your SQL:" . $sql;
+        }
+      }
+    else
+      $message = $conn->error;
+  closeDB();     
+  }
+  return $message;
+}
+
 // API to query DB
 function queryDB($sql) { // returns an object or a string
   global $conn;

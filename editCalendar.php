@@ -1,3 +1,54 @@
+<?php
+require DBConnect.php;
+
+$calendarID =$_GET[calendarID];
+
+$sql = "select * from calendar where id='$calendarID'";
+
+$result = queryDB($sql);
+
+if ($result->num_rows > 0)
+{
+    $row = $result->fetch_assoc();
+    
+    $title = $row["title"];
+    $month = $row["month"];
+    $year = $row["year"];
+    $day1 = $row["1st"];
+    $day2 = $row["2nd"];
+    $day3 = $row["3rd"];
+    $day4 = $row["4th"];
+    $day5 = $row["5th"];
+    $day6 = $row["6th"];
+    $day7 = $row["7th"];
+    $day8 = $row["8th"];
+    $day9 = $row["9th"];
+    $day10 = $row["10th"];
+    $day11 = $row["11th"];
+    $day12 = $row["12th"];
+    $day13 = $row["13th"];
+    $day14 = $row["14th"];
+    $day15 = $row["15th"];
+    $day16 = $row["16th"];
+    $day17 = $row["17th"];
+    $day18 = $row["18th"];
+    $day19 = $row["19th"];
+    $day20 = $row["20th"];
+    $day21 = $row["21st"];
+    $day22 = $row["22nd"];
+    $day23 = $row["23th"];
+    $day24 = $row["24th"];
+    $day25 = $row["25th"];
+    $day26 = $row["26th"];
+    $day27 = $row["27th"];
+    $day28 = $row["28th"];
+    $day29 = $row["29th"];
+    $day30 = $row["30th"];
+    $day31 = $row["31st"];
+}
+
+?>
+
 <html>
     <head>
         <title>Add Calendar</title>
@@ -18,7 +69,7 @@
                     <div class="col-md-3"></div>
                     <div class="col-md-6">
                         <label for="title" class="form-label">Calendar Title:</label>
-                        <input class="form-control" placeholder="Enter title" name="title" size="40" required>
+                        <input class="form-control" value=$day1 name="title" size="40" required>
                         <div class="valid-feedback">Valid.</div>
                         <div class="invalid-feedback">Please fill out this field.</div>
                     </div>
