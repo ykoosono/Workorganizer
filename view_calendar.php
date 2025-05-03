@@ -1,75 +1,106 @@
 <?php include 'header.php'; ?>
-
 <?php
-$host = 'localhost';
-$db = 'workorganizer_db';
-$user = 'root';
-$pass = '';
-$pdo = null;
+// Database connection (Put this at the very beginning)
+$host = 'localhost';       // Change as needed
+$db = 'workorganizer_db';  // Change to your database name
+$user = 'root';            // Change to your database username
+$pass = '';                // Change to your database password
 
 try {
-  $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
-  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // Establish PDO connection
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);  // Enable error mode
 } catch (PDOException $e) {
-  die("Database connection failed: " . $e->getMessage());
+    die("Database connection failed: " . $e->getMessage());
+}
+
+// Other code goes here...
+?>
+
+<?php
+session_start();
+$userId = $_SESSION['user_id'] ?? null;
+if (!$userId) {
+    echo "<div class='alert alert-danger'>Please log in to access this calendar.</div>";
+    exit;
 }
 
 $calendarId = $_GET['id'] ?? null;
 if (!$calendarId || !is_numeric($calendarId)) {
-  echo "<div class='container mt-5'><div class='alert alert-danger'>Invalid calendar ID.</div></div>";
-  include 'footer.php';
-  exit;
+    echo "<div class='alert alert-danger'>Invalid calendar ID.</div>";
+    exit;
 }
-
-// Fetch calendar
-$stmt = $pdo->prepare("SELECT * FROM calendars WHERE id = ?");
-$stmt->execute([$calendarId]);
+echo $userId;
+echo $calendarId;
+// Check if the calendar belongs to the user
+$stmt = $pdo->prepare("SELECT * FROM calendars WHERE id = ? AND user_id = ?");
+$stmt->execute([$calendarId, $userId]);
 $calendar = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$calendar) {
-  echo "<div class='container mt-5'><div class='alert alert-warning'>Calendar not found.</div></div>";
-  include 'footer.php';
-  exit;
+    echo "<div class='alert alert-danger'>You do not have permission to access this calendar.</div>";
+    exit;
 }
 
-// Fetch incomplete tasks
+// Fetch user role
+$stmt = $pdo->prepare("SELECT r.role_name FROM users_calendars uc JOIN roles r ON uc.role_id = r.id WHERE uc.user_id = ? AND uc.calendar_id = ?");
+$stmt->execute([$userId, $calendarId]);
+$userRole = $stmt->fetchColumn();
+
+// Role-based access control
+if ($userRole === 'viewer') {
+    echo "<div class='container mt-5'><div class='alert alert-warning'>You have view-only access to this calendar.</div></div>";
+    include 'footer.php';
+    exit;
+}
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $title = $_POST['title'] ?? '';
+    $date = $_POST['date'] ?? '';
+    $details = $_POST['details'] ?? '';
+    $eventId = $_POST['event_id'] ?? null;
+    $assignedUserId = $_POST['assigned_user_id'] ?? null; // New field for assigned user
+
+    if (!empty($title) && !empty($date)) {
+        if ($eventId) {
+            // Update event
+            $stmt = $pdo->prepare("UPDATE events SET title=?, date=?, details=? WHERE id=? AND calendar_id=?");
+            $stmt->execute([$title, $date, $details, $eventId, $calendarId]);
+        } else {
+            // Insert new event
+            $stmt = $pdo->prepare("INSERT INTO events (calendar_id, title, date, details) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$calendarId, $title, $date, $details]);
+            $eventId = $pdo->lastInsertId();
+        }
+
+        // Assign user to event
+        if ($assignedUserId) {
+            $stmt = $pdo->prepare("INSERT INTO task_assignments (event_id, user_id) VALUES (?, ?)");
+            $stmt->execute([$eventId, $assignedUserId]);
+        }
+
+        header("Location: view-calendar.php?id=$calendarId");
+        exit;
+    }
+}
+
+// Fetch incomplete events
 $incompleteStmt = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 0 ORDER BY date ASC");
 $incompleteStmt->execute([$calendarId]);
 $incompleteEvents = $incompleteStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch complete tasks
+// Fetch complete events
 $completeStmt = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 1 ORDER BY date ASC");
 $completeStmt->execute([$calendarId]);
 $completeEvents = $completeStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Add or edit event
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $title = $_POST['title'] ?? '';
-  $date = $_POST['date'] ?? '';
-  $details = $_POST['details'] ?? '';
-  $eventId = $_POST['event_id'] ?? null;
-
-  if (!empty($title) && !empty($date)) {
-    if ($eventId) {
-      // Update event
-      $stmt = $pdo->prepare("UPDATE events SET title=?, date=?, details=? WHERE id=? AND calendar_id=?");
-      $stmt->execute([$title, $date, $details, $eventId, $calendarId]);
-    } else {
-      // Insert new event
-      $stmt = $pdo->prepare("INSERT INTO events (calendar_id, title, date, details) VALUES (?, ?, ?, ?)");
-      $stmt->execute([$calendarId, $title, $date, $details]);
-    }
-    header("Location: view-calendar.php?id=$calendarId");
-    exit;
-  }
-}
 
 // Editing specific event
 $editingEvent = null;
 if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
-  $editId = $_GET['edit_event'];
-  $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ? AND calendar_id = ?");
-  $stmt->execute([$editId, $calendarId]);
-  $editingEvent = $stmt->fetch(PDO::FETCH_ASSOC);
+    $editId = $_GET['edit_event'];
+    $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ? AND calendar_id = ?");
+    $stmt->execute([$editId, $calendarId]);
+    $editingEvent = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 ?>
 
@@ -98,7 +129,7 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
                         data-status="1">
                   Mark Complete
                 </button>
-                <a href="?id=<?php echo $calendarId; ?>&edit_event=<?php echo $event['id']; ?>" class="btn btn-outline-primary">Edit</a>
+                <a href="?id=<?php echo $calendarId; ?>&edit_event=<?php echo $event['id'].'#edit_form'; ?>" class="btn btn-outline-primary">Edit</a>
                 <a href="?id=<?php echo $calendarId; ?>&delete_event=<?php echo $event['id']; ?>" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this event?');">Delete</a>
               </div>
             </li>
@@ -139,8 +170,8 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
 
       <!-- Add/Edit Task Form -->
       <hr>
-      <h4 class="mb-3"><?php echo $editingEvent ? 'Edit Task' : 'Add a New Task'; ?></h4>
-      <form method="POST">
+      <h4 class="mb-3" id=<?php echo $editingEvent ? 'edit_form':'' ?>><?php echo $editingEvent ? 'Edit Task' : 'Add a New Task'; ?></h4>
+      <form method="POST" action=<?php echo $editingEvent ? 'update_assignment.php': '' ?>>
         <input type="hidden" name="event_id" value="<?php echo $editingEvent['id'] ?? ''; ?>">
         <div class="mb-3">
           <label for="title" class="form-label">Task Title</label>
@@ -154,6 +185,21 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
           <label for="details" class="form-label">Details</label>
           <textarea class="form-control" id="details" name="details"><?php echo $editingEvent['details'] ?? ''; ?></textarea>
         </div>
+        <div class="mb-3">
+          <label for="assigned_user_id" class="form-label">Assign User</label>
+          <select class="form-control" id="assigned_user_id" name="assigned_user_id">
+
+            <?php
+            $stmt = $pdo->prepare("SELECT user_id as id, name as username FROM users");
+            $stmt->execute();
+            $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($users as $user) {
+              $selected = ($editingEvent && $editingEvent['assigned_user_id'] == $user['id']) ? 'selected' : '';
+              echo "<option value='{$user['id']}' $selected>{$user['username']}</option>";
+            }
+            ?>
+          </select>
+        </div>
         <button type="submit" class="btn btn-<?php echo $editingEvent ? 'primary' : 'success'; ?>">
           <?php echo $editingEvent ? 'Update Task' : 'Add Task'; ?>
         </button>
@@ -164,7 +210,8 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
 
       <!-- Navigation -->
       <div class="mt-4">
-        <!-- Edit Calendar Button (Functional) -->
+        <a href="view_calendar.php?id=<?php echo $calendarId; ?>" class="btn btn-primary">Back to Calendar</a>
+        <a href="assign_task_form.php?id=<?php echo $calendarId; ?>" class="btn btn-success">Assign Tasks</a>
         <a href="homepage.php" class="btn btn-primary">Back to My Calendars</a>
         <a href="edit-calendar.php?id=<?php echo $calendarId; ?>" class="btn btn-warning">Edit Calendar</a>
         <a href="add-member.php?id=<?php echo $calendarId; ?>" class="btn btn-success">Add Member</a>
@@ -201,3 +248,4 @@ document.querySelectorAll('.toggle-complete').forEach(button => {
   });
 });
 </script>
+
