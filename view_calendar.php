@@ -2,7 +2,6 @@
 session_start();
 include 'header.php';
 
-// DB connection
 $host = 'localhost';
 $db = 'workorganizer_db';
 $user = 'root';
@@ -15,7 +14,6 @@ try {
     die("DB connection failed: " . $e->getMessage());
 }
 
-// Validate session and calendar ID
 $userId = $_SESSION['user_id'] ?? null;
 $calendarId = isset($_GET['id']) ? intval($_GET['id']) : null;
 
@@ -28,7 +26,6 @@ if (!$calendarId) {
     include 'footer.php'; exit;
 }
 
-// Verify user access
 $stmt = $pdo->prepare("SELECT * FROM calendars WHERE id = ? AND user_id = ?");
 $stmt->execute([$calendarId, $userId]);
 $calendar = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -37,7 +34,6 @@ if (!$calendar) {
     include 'footer.php'; exit;
 }
 
-// Get user role
 $stmt = $pdo->prepare("
     SELECT r.role_name
     FROM users_calendars uc
@@ -52,7 +48,6 @@ if ($userRole === 'viewer') {
     include 'footer.php'; exit;
 }
 
-// Add/Edit task
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $title = trim($_POST['title'] ?? '');
     $date = $_POST['date'] ?? '';
@@ -70,18 +65,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $eventId = $pdo->lastInsertId();
         }
 
-        // Assign user if provided
         if ($assignedUserId) {
             $stmt = $pdo->prepare("INSERT IGNORE INTO task_assignments (event_id, user_id) VALUES (?, ?)");
             $stmt->execute([$eventId, $assignedUserId]);
         }
 
-        header("Location: view_calendar.php?id=$calendarId");
+        header("Location: view_calendar.php?id=$calendarId&success=Task saved successfully");
         exit;
     }
 }
 
-// Fetch tasks
 $incompleteEvents = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 0 ORDER BY date ASC");
 $incompleteEvents->execute([$calendarId]);
 $incompleteEvents = $incompleteEvents->fetchAll(PDO::FETCH_ASSOC);
@@ -90,7 +83,6 @@ $completeEvents = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND 
 $completeEvents->execute([$calendarId]);
 $completeEvents = $completeEvents->fetchAll(PDO::FETCH_ASSOC);
 
-// Editing
 $editingEvent = null;
 if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
     $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ? AND calendar_id = ?");
@@ -104,92 +96,101 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
 <head>
     <meta charset="UTF-8">
     <title>Calendar</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
     <style>
-        #calendar { max-width: 900px; margin: auto; font-size: 0.85rem; }
-        .fc-event { cursor: pointer; }
+        body { background: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
+        #calendar { max-width: 100%; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .fc-event { border-radius: 5px; padding: 2px 5px; }
+        .card { border-radius: 1rem; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05); }
+        .btn-sm { margin: 2px; }
+        .form-control, .btn { border-radius: 0.5rem; }
     </style>
 </head>
 <body>
 <main class="container mt-5">
+    <?php if (isset($_GET['success'])): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <?= htmlspecialchars($_GET['success']) ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <?php endif; ?>
+
     <h2 class="mb-3"><?= htmlspecialchars($calendar['title']) ?></h2>
     <p class="text-muted"><?= htmlspecialchars($calendar['description']) ?></p>
 
-   <div class="row">
-       <div class="col-md-6">
-           <div class="card mb-4">
-               <div class="card-header bg-primary text-white">Calendar</div>
-               <div class="card-body">
-                   <div id="calendar"></div>
-                   <!-- Color Legend -->
-                   <div class="mt-3">
-                       <h6>Legend:</h6>
-                       <div class="d-flex align-items-center mb-2">
-                           <div style="width: 20px; height: 20px; background-color: #28a745; margin-right: 10px;"></div>
-                           <span>Completed Task</span>
-                       </div>
-                       <div class="d-flex align-items-center">
-                           <div style="width: 20px; height: 20px; background-color: #ffc107; margin-right: 10px;"></div>
-                           <span>Incomplete Task</span>
-                       </div>
-                   </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">Calendar</div>
+                <div class="card-body">
+                    <div id="calendar"></div>
+                    <div class="mt-3">
+                        <h6>Legend:</h6>
+                        <div class="d-flex align-items-center mb-2">
+                            <div style="width: 20px; height: 20px; background-color: #28a745; margin-right: 10px;"></div>
+                            <span>Completed Task</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div style="width: 20px; height: 20px; background-color: #ffc107; margin-right: 10px;"></div>
+                            <span>Incomplete Task</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-               </div>
-           </div>
-       </div>
+        <div class="col-md-6">
+            <h4>Incomplete Tasks</h4>
+            <?php if ($incompleteEvents): ?>
+                <ul class="list-group mb-4">
+                <?php foreach ($incompleteEvents as $event): ?>
+                    <li class="list-group-item d-flex justify-content-between align-items-start animate__animated animate__fadeIn">
+                        <div>
+                            <strong><?= htmlspecialchars($event['title']) ?></strong><br>
+                            <small><?= htmlspecialchars($event['date']) ?></small>
+                            <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-success toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="1">Complete</button>
+                            <a href="?id=<?= $calendarId ?>&edit_event=<?= $event['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
+                            <a href="?id=<?= $calendarId ?>&delete_event=<?= $event['id'] ?>" class="btn btn-sm btn-danger">Delete</a>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+                </ul>
+            <?php else: ?>
+                <p>No incomplete tasks found.</p>
+            <?php endif; ?>
 
-       <div class="col-md-6">
-           <!-- Incomplete Tasks -->
-           <h4>Incomplete Tasks</h4>
-           <?php if ($incompleteEvents): ?>
-               <ul class="list-group mb-4">
-               <?php foreach ($incompleteEvents as $event): ?>
-                   <li class="list-group-item d-flex justify-content-between">
-                       <div>
-                           <strong><?= htmlspecialchars($event['title']) ?></strong><br>
-                           <small><?= htmlspecialchars($event['date']) ?></small>
-                           <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
-                       </div>
-                       <div>
-                           <button class="btn btn-sm btn-success toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="1">Complete</button>
-                           <a href="?id=<?= $calendarId ?>&edit_event=<?= $event['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
-                           <a href="?id=<?= $calendarId ?>&delete_event=<?= $event['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete?');">Delete</a>
-                       </div>
-                   </li>
-               <?php endforeach; ?>
-               </ul>
-           <?php else: ?>
-               <p>No incomplete tasks found.</p>
-           <?php endif; ?>
-
-           <!-- Complete Tasks -->
-           <h4>Completed Tasks</h4>
-           <?php if ($completeEvents): ?>
-               <ul class="list-group mb-4">
-               <?php foreach ($completeEvents as $event): ?>
-                   <li class="list-group-item d-flex justify-content-between">
-                       <div>
-                           <strong><?= htmlspecialchars($event['title']) ?></strong><br>
-                           <small><?= htmlspecialchars($event['date']) ?></small>
-                           <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
-                       </div>
-                       <div>
-                           <button class="btn btn-sm btn-secondary toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="0">Undo</button>
-                           <a href="?id=<?= $calendarId ?>&edit_event=<?= $event['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
-                           <a href="?id=<?= $calendarId ?>&delete_event=<?= $event['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete?');">Delete</a>
-                       </div>
-                   </li>
-               <?php endforeach; ?>
-               </ul>
-           <?php else: ?>
-               <p>No completed tasks found.</p>
-           <?php endif; ?>
-       </div>
-   </div>
-
+            <h4>Completed Tasks</h4>
+            <?php if ($completeEvents): ?>
+                <ul class="list-group mb-4">
+                <?php foreach ($completeEvents as $event): ?>
+                    <li class="list-group-item d-flex justify-content-between align-items-start animate__animated animate__fadeIn">
+                        <div>
+                            <strong><?= htmlspecialchars($event['title']) ?></strong><br>
+                            <small><?= htmlspecialchars($event['date']) ?></small>
+                            <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="0">Undo</button>
+                            <a href="?id=<?= $calendarId ?>&edit_event=<?= $event['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
+                            <a href="?id=<?= $calendarId ?>&delete_event=<?= $event['id'] ?>" class="btn btn-sm btn-danger">Delete</a>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+                </ul>
+            <?php else: ?>
+                <p>No completed tasks found.</p>
+            <?php endif; ?>
+        </div>
+    </div>
 
     <script>
     $(function () {
@@ -209,7 +210,7 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
             eventClick: function(event) {
                 alert('Task: ' + event.title + '\nStarts: ' + event.start.format());
             },
-            eventDrop: function(event, delta) {
+            eventDrop: function(event) {
                 $.post('update_event.php', {
                     id: event.id,
                     title: event.title,
@@ -225,8 +226,6 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
     });
     </script>
 
-
-    <!-- Add/Edit Task -->
     <h4><?= $editingEvent ? 'Edit Task' : 'Add New Task' ?></h4>
     <form method="POST" action="view_calendar.php?id=<?= $calendarId ?>">
         <input type="hidden" name="event_id" value="<?= $editingEvent['id'] ?? '' ?>">
@@ -237,7 +236,8 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
         <div class="mb-3">
             <label>Date & Time</label>
             <input type="datetime-local" name="date" class="form-control" required
-                value="<?= isset($editingEvent['date']) ? date('Y-m-d\TH:i', strtotime($editingEvent['date'])) : '' ?>">
+                value="<?= isset($editingEvent['date']) ? date('Y-m-d\TH:i', strtotime($editingEvent['date'])) : '' ?>"
+                min="<?= date('Y-m-d\TH:i') ?>">
         </div>
         <div class="mb-3">
             <label>Details</label>
@@ -263,16 +263,15 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
     </form>
 
     <hr>
-    <div class="mt-4">
-        <a href="homepage.php" class="btn btn-primary">Back</a>
-        <a href="assign_task_form.php?id=<?= $calendarId ?>" class="btn btn-success">Assign Tasks</a>
-        <a href="edit-calendar.php?id=<?= $calendarId ?>" class="btn btn-warning">Edit Calendar</a>
-        <a href="add-member.php?id=<?= $calendarId ?>" class="btn btn-info">Add Member</a>
-        <a href="remove-member.php?id=<?= $calendarId ?>" class="btn btn-danger">Remove Member</a>
+    <div class="mt-4 d-flex flex-wrap gap-2">
+        <a href="homepage.php" class="btn btn-outline-primary">Back</a>
+        <a href="assign_task_form.php?id=<?= $calendarId ?>" class="btn btn-outline-success">Assign Tasks</a>
+        <a href="edit-calendar.php?id=<?= $calendarId ?>" class="btn btn-outline-warning">Edit Calendar</a>
+        <a href="add-member.php?id=<?= $calendarId ?>" class="btn btn-outline-info">Add Member</a>
+        <a href="remove-member.php?id=<?= $calendarId ?>" class="btn btn-outline-danger">Remove Member</a>
     </div>
 </main>
 
-<!-- AJAX for toggling completion -->
 <script>
 document.querySelectorAll('.toggle-complete').forEach(btn => {
     btn.addEventListener('click', function () {
@@ -286,6 +285,34 @@ document.querySelectorAll('.toggle-complete').forEach(btn => {
         })
         .then(res => res.json())
         .then(data => data.success ? location.reload() : alert('Failed to update task.'));
+    });
+});
+</script>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Confirm Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this task?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+document.querySelectorAll('.btn-danger[href*="delete_event"]').forEach(btn => {
+    btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.getElementById('confirmDeleteBtn').href = this.href;
+        new bootstrap.Modal(document.getElementById('confirmDeleteModal')).show();
     });
 });
 </script>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 04, 2025 at 08:55 PM
+-- Generation Time: May 05, 2025 at 01:53 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -40,7 +40,7 @@ CREATE TABLE `calendars` (
 --
 
 INSERT INTO `calendars` (`id`, `title`, `description`, `user_id`, `created_at`) VALUES
-(1, 'Project Alpha', 'Calendar for tracking Project Alpha tasks.', 1, '2025-05-04 17:46:30'),
+(1, 'Project Alpha', 'Calendar for tracking Project Alpha tasks.ddd', 1, '2025-05-04 17:46:30'),
 (2, 'Marketing Campaign', 'Campaign planning and deadlines.', 1, '2025-05-04 17:46:30'),
 (3, 'Dev Sprint 1', 'Development sprint 1 timeline.', 1, '2025-05-04 17:46:30'),
 (4, 'HR Calendar', 'Internal HR-related events.', 1, '2025-05-04 17:46:30'),
@@ -49,7 +49,8 @@ INSERT INTO `calendars` (`id`, `title`, `description`, `user_id`, `created_at`) 
 (7, 'Team Meetings', 'Schedule for weekly team meetings.', 1, '2025-05-04 17:46:30'),
 (8, 'Client Work', 'Tasks related to client deliverables.', 1, '2025-05-04 17:46:30'),
 (9, 'Company Events', 'Company-wide event planning.', 1, '2025-05-04 17:46:30'),
-(10, 'Freelance Schedule', 'Freelance client calendar.', 1, '2025-05-04 17:46:30');
+(10, 'Freelance Schedule', 'Freelance client calendar.', 1, '2025-05-04 17:46:30'),
+(11, 'dsgfg', 'fdsggda', 1, '2025-05-04 20:51:30');
 
 -- --------------------------------------------------------
 
@@ -79,7 +80,17 @@ INSERT INTO `events` (`id`, `calendar_id`, `title`, `date`, `details`, `is_compl
 (6, 3, 'Doctor Appointment', '2025-05-02', 'Routine checkup at 10:00 AM.', 0),
 (7, 3, 'Gym Session', '2025-05-03', 'Leg day workout.', 0),
 (8, 1, 'dd', '2025-05-01', 'ghfgfg', 0),
-(9, 1, 'jkgjkgkj', '2025-05-13', 'hkjh', 1);
+(9, 1, 'jkgjkgkj', '2025-05-13', 'hkjh', 1),
+(0, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
+(0, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
+(0, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
+(0, 11, 'dddsdgs', '2025-05-04', 'sdfdgsdgg', 0),
+(0, 11, 'hhhhh', '2025-05-05', 'hjhfghjhghghj', 0),
+(0, 11, 'hhhhh', '2025-05-05', 'hjhfghjhghghj', 0),
+(0, 11, 'hhhhh', '2025-05-05', 'hjhfghjhghghj', 0),
+(0, 2, 'hjhjhjh', '2025-05-16', 'kjhkjghjkhjhk', 0),
+(0, 2, 'adaf', '2025-05-13', 'khjkgjk', 0),
+(0, 2, 'jhhgh', '2025-05-06', 'vhnvhvhvm', 0);
 
 -- --------------------------------------------------------
 
@@ -127,6 +138,19 @@ CREATE TABLE `role_permissions` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tasks`
+--
+
+CREATE TABLE `tasks` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `start_task` datetime NOT NULL,
+  `end_task` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `task_assignments`
 --
 
@@ -142,7 +166,15 @@ CREATE TABLE `task_assignments` (
 
 INSERT INTO `task_assignments` (`id`, `user_id`, `event_id`) VALUES
 (1, 1, 1),
-(2, 1, 1);
+(2, 1, 1),
+(3, 1, 0),
+(4, 1, 0),
+(5, 1, 0),
+(6, 2, 0),
+(7, 2, 0),
+(8, 2, 0),
+(9, 1, 0),
+(10, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -195,7 +227,8 @@ INSERT INTO `users_calendars` (`id`, `calendar_id`, `user_id`, `role_id`) VALUES
 (8, 0, 1, 1),
 (9, 1, 2, 2),
 (10, 1, 3, 2),
-(11, 1, 1, 3);
+(11, 1, 1, 3),
+(12, 11, 1, 1);
 
 --
 -- Indexes for dumped tables
@@ -230,6 +263,12 @@ ALTER TABLE `role_permissions`
   ADD KEY `permission_id` (`permission_id`);
 
 --
+-- Indexes for table `tasks`
+--
+ALTER TABLE `tasks`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `task_assignments`
 --
 ALTER TABLE `task_assignments`
@@ -256,7 +295,7 @@ ALTER TABLE `users_calendars`
 -- AUTO_INCREMENT for table `calendars`
 --
 ALTER TABLE `calendars`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -277,10 +316,16 @@ ALTER TABLE `role_permissions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `tasks`
+--
+ALTER TABLE `tasks`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `task_assignments`
 --
 ALTER TABLE `task_assignments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -292,7 +337,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users_calendars`
 --
 ALTER TABLE `users_calendars`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables
