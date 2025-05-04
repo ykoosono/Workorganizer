@@ -1,6 +1,6 @@
 <?php
-include 'header.php';
 session_start();
+include 'header.php';
 
 // DB connection
 $host = 'localhost';
@@ -15,7 +15,7 @@ try {
     die("DB connection failed: " . $e->getMessage());
 }
 
-// Session & calendar validation
+// Validate session and calendar ID
 $userId = $_SESSION['user_id'] ?? null;
 $calendarId = isset($_GET['id']) ? intval($_GET['id']) : null;
 
@@ -28,7 +28,7 @@ if (!$calendarId) {
     include 'footer.php'; exit;
 }
 
-// Calendar access check
+// Verify user access
 $stmt = $pdo->prepare("SELECT * FROM calendars WHERE id = ? AND user_id = ?");
 $stmt->execute([$calendarId, $userId]);
 $calendar = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -37,7 +37,7 @@ if (!$calendar) {
     include 'footer.php'; exit;
 }
 
-// Role check
+// Get user role
 $stmt = $pdo->prepare("
     SELECT r.role_name
     FROM users_calendars uc
@@ -52,7 +52,7 @@ if ($userRole === 'viewer') {
     include 'footer.php'; exit;
 }
 
-// Handle form submission (Add/Edit Task)
+// Add/Edit task
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $title = trim($_POST['title'] ?? '');
     $date = $_POST['date'] ?? '';
@@ -70,59 +70,68 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $eventId = $pdo->lastInsertId();
         }
 
-        // Assign user
+        // Assign user if provided
         if ($assignedUserId) {
             $stmt = $pdo->prepare("INSERT IGNORE INTO task_assignments (event_id, user_id) VALUES (?, ?)");
             $stmt->execute([$eventId, $assignedUserId]);
         }
 
-        header("Location: view-calendar.php?id=$calendarId");
+        header("Location: view_calendar.php?id=$calendarId");
         exit;
     }
 }
 
-// Fetch events
-$incompleteStmt = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 0 ORDER BY date ASC");
-$incompleteStmt->execute([$calendarId]);
-$incompleteEvents = $incompleteStmt->fetchAll(PDO::FETCH_ASSOC);
+// Fetch tasks
+$incompleteEvents = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 0 ORDER BY date ASC");
+$incompleteEvents->execute([$calendarId]);
+$incompleteEvents = $incompleteEvents->fetchAll(PDO::FETCH_ASSOC);
 
-$completeStmt = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 1 ORDER BY date ASC");
-$completeStmt->execute([$calendarId]);
-$completeEvents = $completeStmt->fetchAll(PDO::FETCH_ASSOC);
+$completeEvents = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 1 ORDER BY date ASC");
+$completeEvents->execute([$calendarId]);
+$completeEvents = $completeEvents->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch event for editing
+// Editing
 $editingEvent = null;
 if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
-    $editId = $_GET['edit_event'];
     $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ? AND calendar_id = ?");
-    $stmt->execute([$editId, $calendarId]);
+    $stmt->execute([$_GET['edit_event'], $calendarId]);
     $editingEvent = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Calendar</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+    <style>
+        #calendar { max-width: 900px; margin: auto; font-size: 0.85rem; }
+        .fc-event { cursor: pointer; }
+    </style>
 </head>
 <body>
-    <div id="calendar"></div>
+<main class="container mt-5">
+    <h2 class="mb-3"><?= htmlspecialchars($calendar['title']) ?></h2>
+    <p class="text-muted"><?= htmlspecialchars($calendar['description']) ?></p>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">Calendar</div>
+        <div class="card-body">
+            <div id="calendar"></div>
+        </div>
+    </div>
 
     <script>
-    $(document).ready(function() {
+    $(function () {
         $('#calendar').fullCalendar({
             events: {
                 url: 'fetch_events.php',
-                data: {
-                    calendar_id: <?php echo $_GET['id']; ?>
-                },
-                error: function() {
-                    alert('There was an error while fetching events.');
-                }
+                data: { calendar_id: <?= $calendarId ?> },
+                error: () => alert('There was an error while fetching events.')
             },
             editable: true,
             droppable: true,
@@ -131,204 +140,118 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
             },
-            defaultView: 'month'
+            eventClick: function(event) {
+                alert('Task: ' + event.title + '\nStarts: ' + event.start.format());
+            },
+            eventDrop: function(event, delta) {
+                $.post('update_event.php', {
+                    id: event.id,
+                    title: event.title,
+                    start: event.start.format(),
+                    end: event.end ? event.end.format() : null
+                }, function(response) {
+                    if (response.trim() !== 'success') {
+                        alert('Update failed.');
+                    }
+                });
+            }
         });
     });
     </script>
-</body>
-</html>
 
-<!-- FullCalendar CSS/JS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.css" rel="stylesheet" />
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
-
-<!-- Calendar container -->
-<main class="container mt-5">
-  <h2 class="mb-3"><?php echo htmlspecialchars($calendar['title']); ?></h2>
-  <p class="text-muted"><?php echo htmlspecialchars($calendar['description']); ?></p>
-
-  <div class="card mb-4">
-    <div class="card-header bg-primary text-white">Calendar</div>
-    <div class="card-body">
-      <div id="calendar"></div>
-    </div>
-  </div>
-
-  <script>
-  $(function () {
-      $('#calendar').fullCalendar({
-          events: 'get_events.php?id=<?php echo $calendarId; ?>',
-          editable: true,
-          droppable: true,
-          header: {
-              left: 'prev,next today',
-              center: 'title',
-              right: 'month,agendaWeek,agendaDay'
-          },
-          eventClick: function(event) {
-              if (confirm('Delete this event?')) {
-                  $.post('delete_event.php', { id: event.id }, function(response) {
-                      if (response.trim() === 'success') {
-                          $('#calendar').fullCalendar('removeEvents', event.id);
-                      } else {
-                          alert('Failed to delete.');
-                      }
-                  });
-              }
-          },
-          eventDrop: function(event) {
-              $.post('update_event.php', {
-                  id: event.id,
-                  title: event.title,
-                  start: event.start.format(),
-                  end: event.end?.format() || null
-              }, function(response) {
-                  if (response.trim() !== 'success') {
-                      alert('Update failed.');
-                  }
-              });
-          }
-      });
-  });
-  </script>
-  <script>
-  $(document).ready(function() {
-      $('#calendar').fullCalendar({
-          events: {
-              url: 'get_events.php',
-              data: {
-                  id: <?php echo $calendarId; ?> // Pass the calendar ID to the PHP script
-              },
-              error: function() {
-                  alert('There was an error while fetching events.');
-              }
-          },
-          editable: true,
-          droppable: true,
-          header: {
-              left: 'prev,next today',
-              center: 'title',
-              right: 'month,agendaWeek,agendaDay'
-          },
-          defaultView: 'month',
-          eventClick: function(event) {
-              alert('Task: ' + event.title + '\nStarts: ' + event.start.format());
-          },
-          eventDrop: function(event, delta) {
-              alert(event.title + ' was moved ' + delta + ' days');
-          }
-      });
-  });
-  </script>
-
-
-  <style>
-    #calendar {
-        max-width: 900px;
-        margin: auto;
-        font-size: 0.85rem;
-    }
-    .fc-event {
-        cursor: pointer;
-    }
-  </style>
-
-  <!-- Incomplete Tasks -->
-  <h4>Incomplete Tasks</h4>
-  <?php if ($incompleteEvents): ?>
-    <ul class="list-group mb-4">
-    <?php foreach ($incompleteEvents as $event): ?>
-      <li class="list-group-item d-flex justify-content-between">
-        <div>
-          <strong><?php echo htmlspecialchars($event['title']); ?></strong>
-          <br><small><?php echo htmlspecialchars($event['date']); ?></small>
-          <p><?php echo htmlspecialchars($event['details']); ?></p>
-        </div>
-        <div>
-          <button class="btn btn-sm btn-success toggle-complete" data-event-id="<?php echo $event['id']; ?>" data-status="1">Complete</button>
-          <a href="?id=<?php echo $calendarId; ?>&edit_event=<?php echo $event['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
-          <a href="?id=<?php echo $calendarId; ?>&delete_event=<?php echo $event['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete?');">Delete</a>
-        </div>
-      </li>
-    <?php endforeach; ?>
-    </ul>
-  <?php else: ?>
-    <p>No incomplete tasks found.</p>
-  <?php endif; ?>
-
-  <!-- Complete Tasks -->
-  <h4>Complete Tasks</h4>
-  <?php if ($completeEvents): ?>
-    <ul class="list-group mb-4">
-    <?php foreach ($completeEvents as $event): ?>
-      <li class="list-group-item d-flex justify-content-between">
-        <div>
-          <strong><?php echo htmlspecialchars($event['title']); ?></strong>
-          <br><small><?php echo htmlspecialchars($event['date']); ?></small>
-          <p><?php echo htmlspecialchars($event['details']); ?></p>
-        </div>
-        <div>
-          <button class="btn btn-sm btn-secondary toggle-complete" data-event-id="<?php echo $event['id']; ?>" data-status="0">Undo Complete</button>
-          <a href="?id=<?php echo $calendarId; ?>&edit_event=<?php echo $event['id']; ?>" class="btn btn-sm btn-primary">Edit</a>
-          <a href="?id=<?php echo $calendarId; ?>&delete_event=<?php echo $event['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete?');">Delete</a>
-        </div>
-      </li>
-    <?php endforeach; ?>
-    </ul>
-  <?php else: ?>
-    <p>No completed tasks found.</p>
-  <?php endif; ?>
-
-  <!-- Add/Edit Task Form -->
-  <h4 id="edit_form"><?php echo $editingEvent ? 'Edit Task' : 'Add New Task'; ?></h4>
-  <form method="POST">
-    <input type="hidden" name="event_id" value="<?php echo $editingEvent['id'] ?? ''; ?>">
-    <div class="mb-3">
-      <label for="title">Title</label>
-      <input type="text" name="title" class="form-control" required value="<?php echo $editingEvent['title'] ?? ''; ?>">
-    </div>
-    <div class="mb-3">
-      <label for="date">Date & Time</label>
-      <input type="datetime-local" name="date" class="form-control" required value="<?php echo isset($editingEvent['date']) ? date('Y-m-d\TH:i', strtotime($editingEvent['date'])) : ''; ?>">
-    </div>
-    <div class="mb-3">
-      <label for="details">Details</label>
-      <textarea name="details" class="form-control"><?php echo $editingEvent['details'] ?? ''; ?></textarea>
-    </div>
-    <div class="mb-3">
-      <label for="assigned_user_id">Assign To</label>
-      <select name="assigned_user_id" class="form-control">
-        <option value="">-- None --</option>
-        <?php
-        $stmt = $pdo->prepare("SELECT user_id as id, name FROM users");
-        $stmt->execute();
-        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $user) {
-            $selected = ($editingEvent['assigned_user_id'] ?? '') == $user['id'] ? 'selected' : '';
-            echo "<option value='{$user['id']}' $selected>{$user['name']}</option>";
-        }
-        ?>
-      </select>
-    </div>
-    <button class="btn btn-<?php echo $editingEvent ? 'primary' : 'success'; ?>"><?php echo $editingEvent ? 'Update Task' : 'Add Task'; ?></button>
-    <?php if ($editingEvent): ?>
-      <a href="view-calendar.php?id=<?php echo $calendarId; ?>" class="btn btn-secondary">Cancel</a>
+    <!-- Incomplete Tasks -->
+    <h4>Incomplete Tasks</h4>
+    <?php if ($incompleteEvents): ?>
+        <ul class="list-group mb-4">
+        <?php foreach ($incompleteEvents as $event): ?>
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    <strong><?= htmlspecialchars($event['title']) ?></strong><br>
+                    <small><?= htmlspecialchars($event['date']) ?></small>
+                    <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-success toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="1">Complete</button>
+                    <a href="?id=<?= $calendarId ?>&edit_event=<?= $event['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="?id=<?= $calendarId ?>&delete_event=<?= $event['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete?');">Delete</a>
+                </div>
+            </li>
+        <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p>No incomplete tasks found.</p>
     <?php endif; ?>
-  </form>
 
-  <hr>
-  <!-- Navigation -->
-  <div class="mt-4">
-    <a href="homepage.php" class="btn btn-primary">Back to My Calendars</a>
-    <a href="assign_task_form.php?id=<?php echo $calendarId; ?>" class="btn btn-success">Assign Tasks</a>
-    <a href="edit-calendar.php?id=<?php echo $calendarId; ?>" class="btn btn-warning">Edit Calendar</a>
-    <a href="add-member.php?id=<?php echo $calendarId; ?>" class="btn btn-info">Add Member</a>
-    <a href="remove-member.php?id=<?php echo $calendarId; ?>" class="btn btn-danger">Remove Member</a>
-  </div>
+    <!-- Complete Tasks -->
+    <h4>Complete Tasks</h4>
+    <?php if ($completeEvents): ?>
+        <ul class="list-group mb-4">
+        <?php foreach ($completeEvents as $event): ?>
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    <strong><?= htmlspecialchars($event['title']) ?></strong><br>
+                    <small><?= htmlspecialchars($event['date']) ?></small>
+                    <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-secondary toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="0">Undo</button>
+                    <a href="?id=<?= $calendarId ?>&edit_event=<?= $event['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="?id=<?= $calendarId ?>&delete_event=<?= $event['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete?');">Delete</a>
+                </div>
+            </li>
+        <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p>No completed tasks found.</p>
+    <?php endif; ?>
+
+    <!-- Add/Edit Task -->
+    <h4><?= $editingEvent ? 'Edit Task' : 'Add New Task' ?></h4>
+    <form method="POST" action="view_calendar.php?id=<?= $calendarId ?>">
+        <input type="hidden" name="event_id" value="<?= $editingEvent['id'] ?? '' ?>">
+        <div class="mb-3">
+            <label>Title</label>
+            <input type="text" name="title" class="form-control" required value="<?= htmlspecialchars($editingEvent['title'] ?? '') ?>">
+        </div>
+        <div class="mb-3">
+            <label>Date & Time</label>
+            <input type="datetime-local" name="date" class="form-control" required
+                value="<?= isset($editingEvent['date']) ? date('Y-m-d\TH:i', strtotime($editingEvent['date'])) : '' ?>">
+        </div>
+        <div class="mb-3">
+            <label>Details</label>
+            <textarea name="details" class="form-control"><?= htmlspecialchars($editingEvent['details'] ?? '') ?></textarea>
+        </div>
+        <div class="mb-3">
+            <label>Assign To</label>
+            <select name="assigned_user_id" class="form-control">
+                <option value="">-- None --</option>
+                <?php
+                $stmt = $pdo->query("SELECT user_id as id, name FROM users");
+                foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $user) {
+                    $selected = ($editingEvent['assigned_user_id'] ?? '') == $user['id'] ? 'selected' : '';
+                    echo "<option value='{$user['id']}' $selected>{$user['name']}</option>";
+                }
+                ?>
+            </select>
+        </div>
+        <button class="btn btn-<?= $editingEvent ? 'primary' : 'success' ?>"><?= $editingEvent ? 'Update' : 'Add' ?> Task</button>
+        <?php if ($editingEvent): ?>
+            <a href="view_calendar.php?id=<?= $calendarId ?>" class="btn btn-secondary">Cancel</a>
+        <?php endif; ?>
+    </form>
+
+    <hr>
+    <div class="mt-4">
+        <a href="homepage.php" class="btn btn-primary">Back</a>
+        <a href="assign_task_form.php?id=<?= $calendarId ?>" class="btn btn-success">Assign Tasks</a>
+        <a href="edit-calendar.php?id=<?= $calendarId ?>" class="btn btn-warning">Edit Calendar</a>
+        <a href="add-member.php?id=<?= $calendarId ?>" class="btn btn-info">Add Member</a>
+        <a href="remove-member.php?id=<?= $calendarId ?>" class="btn btn-danger">Remove Member</a>
+    </div>
 </main>
 
-<!-- AJAX for toggle-completion -->
+<!-- AJAX for toggling completion -->
 <script>
 document.querySelectorAll('.toggle-complete').forEach(btn => {
     btn.addEventListener('click', function () {
@@ -341,10 +264,7 @@ document.querySelectorAll('.toggle-complete').forEach(btn => {
             body: `event_id=${eventId}&is_complete=${status}`
         })
         .then(res => res.json())
-        .then(data => {
-            if (data.success) location.reload();
-            else alert('Failed to update task.');
-        });
+        .then(data => data.success ? location.reload() : alert('Failed to update task.'));
     });
 });
 </script>
