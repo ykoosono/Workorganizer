@@ -1,11 +1,10 @@
-<?php include 'header.php'; ?>
-
 <?php
+session_start();
+
 $host = 'localhost';
 $db = 'workorganizer_db';
 $user = 'root';
 $pass = '';
-$pdo = null;
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
@@ -14,135 +13,89 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-$calendarId = $_GET['id'] ?? null;
-if (!$calendarId || !is_numeric($calendarId)) {
-    echo "<div class='container mt-5'><div class='alert alert-danger'>Invalid calendar ID.</div></div>";
-    include 'footer.php';
-    exit;
-}
+$errors = [];
+$name = '';
+$email = '';
 
-// Fetch calendar
-$stmt = $pdo->prepare("SELECT * FROM calendars WHERE id = ?");
-$stmt->execute([$calendarId]);
-$calendar = $stmt->fetch(PDO::FETCH_ASSOC);
-if (!$calendar) {
-    echo "<div class='container mt-5'><div class='alert alert-warning'>Calendar not found.</div></div>";
-    include 'footer.php';
-    exit;
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
 
-// Fetch incomplete tasks
-$incompleteStmt = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 0 ORDER BY date ASC");
-$incompleteStmt->execute([$calendarId]);
-$incompleteEvents = $incompleteStmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch complete tasks
-$completeStmt = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 1 ORDER BY date ASC");
-$completeStmt->execute([$calendarId]);
-$completeEvents = $completeStmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Add or edit event
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $title = $_POST['title'] ?? '';
-    $date = $_POST['date'] ?? '';
-    $details = $_POST['details'] ?? '';
-    $eventId = $_POST['event_id'] ?? null;
-
-    if (!empty($title) && !empty($date)) {
-        if ($eventId) {
-            // Update event
-            $stmt = $pdo->prepare("UPDATE events SET title=?, date=?, details=? WHERE id=? AND calendar_id=?");
-            $stmt->execute([$title, $date, $details, $eventId, $calendarId]);
+    if (!$name || !$email || !$password || !$confirm_password) {
+        $errors[] = "All fields are required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = "Invalid email format.";
+    } elseif ($password !== $confirm_password) {
+        $errors[] = "Passwords do not match.";
+    } else {
+        // Check for duplicate email
+        $stmt = $pdo->prepare("SELECT user_id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        if ($stmt->fetch()) {
+            $errors[] = "Email is already registered.";
         } else {
-            // Insert new event
-            $stmt = $pdo->prepare("INSERT INTO events (calendar_id, title, date, details) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$calendarId, $title, $date, $details]);
-        }
-        header("Location: view-calendar.php?id=$calendarId");
-        exit;
-    }
-}
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+            $stmt->execute([$name, $email, $hashed_password]);
 
-// Editing specific event
-$editingEvent = null;
-if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
-    $editId = $_GET['edit_event'];
-    $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ? AND calendar_id = ?");
-    $stmt->execute([$editId, $calendarId]);
-    $editingEvent = $stmt->fetch(PDO::FETCH_ASSOC);
+            header("Location: login.php?registered=1");
+            exit;
+        }
+    }
 }
 ?>
 
-<div class="d-flex flex-column min-vh-100">
-    <main class="flex-grow-1">
-        <div class="container mt-5">
-            <h2 class="mb-3"><?php echo htmlspecialchars($calendar['title']); ?></h2>
-            <p class="text-muted"><?php echo htmlspecialchars($calendar['description']); ?></p>
+<?php include 'header.php'; ?>
+<body class="d-flex flex-column min-vh-100">
+<main class="flex-grow-1">
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card p-4 shadow-lg rounded">
+          <h2 class="text-center mb-4">Sign Up</h2>
 
-            <hr>
+          <?php if (!empty($errors)): ?>
+            <div class="alert alert-danger">
+              <?php foreach ($errors as $error): ?>
+                <div><?php echo htmlspecialchars($error); ?></div>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
 
-            <!-- Incomplete Tasks -->
-            <h4 class="mb-3">Incomplete Tasks</h4>
-            <?php if ($incompleteEvents): ?>
-                <ul class="list-group mb-4">
-                    <?php foreach ($incompleteEvents as $event): ?>
-                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="mb-1"><?php echo htmlspecialchars($event['title']); ?></h5>
-                                <small class="text-muted"><?php echo htmlspecialchars($event['date']); ?></small>
-                                <p class="mb-1"><?php echo htmlspecialchars($event['details']); ?></p>
-                            </div>
-                            <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-success toggle-complete"
-                                        data-event-id="<?php echo $event['id']; ?>"
-                                        data-status="1">
-                                    Mark Complete
-                                </button>
-                                <a href="?id=<?php echo $calendarId; ?>&edit_event=<?php echo $event['id']; ?>" class="btn btn-outline-primary">Edit</a>
-                                <a href="?id=<?php echo $calendarId; ?>&delete_event=<?php echo $event['id']; ?>" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this event?');">Delete</a>
-                            </div>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php else: ?>
-                <p>No incomplete tasks found for this calendar.</p>
-            <?php endif; ?>
+          <form method="POST" action="signup.php">
+            <div class="mb-3">
+              <label for="name" class="form-label">Full Name</label>
+              <input type="text" name="name" id="name" class="form-control" required value="<?php echo htmlspecialchars($name); ?>">
+            </div>
 
-            <hr>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email Address</label>
+              <input type="email" name="email" id="email" class="form-control" required value="<?php echo htmlspecialchars($email); ?>">
+            </div>
 
-            <!-- Complete Tasks -->
-            <h4 class="mb-3">Complete Tasks</h4>
-            <?php if ($completeEvents): ?>
-                <ul class="list-group mb-4">
-                    <?php foreach ($completeEvents as $event): ?>
-                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="mb-1"><?php echo htmlspecialchars($event['title']); ?></h5>
-                                <small class="text-muted"><?php echo htmlspecialchars($event['date']); ?></small>
-                                <p class="mb-1"><?php echo htmlspecialchars($event['details']); ?></p>
-                            </div>
-                            <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-secondary toggle-complete"
-                                        data-event-id="<?php echo $event['id']; ?>"
-                                        data-status="0">
-                                    Mark Incomplete
-                                </button>
-                                <a href="?id=<?php echo $calendarId; ?>&edit_event=<?php echo $event['id']; ?>" class="btn btn-outline-primary">Edit</a>
-                                <a href="?id=<?php echo $calendarId; ?>&delete_event=<?php echo $event['id']; ?>" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this event?');">Delete</a>
-                            </div>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php else: ?>
-                <p>No complete tasks found for this calendar.</p>
-            <?php endif; ?>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" name="password" id="password" class="form-control" required>
+            </div>
 
-            <!-- Add/Edit Task Form -->
-            <hr>
-            <h4 class="mb-3"><?php echo $editingEvent ? 'Edit Task' : 'Add a New Task'; ?></h4>
-            <form method="POST">
-                <input type="hidden" name="event_id" value="<?php echo $editingEvent['id'] ?? ''; ?>">
-                <div class="mb-3">
-                    <label for
-::contentReference[oaicite:0]{index=0}
+            <div class="mb-3">
+              <label for="confirm_password" class="form-label">Confirm Password</label>
+              <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+            </div>
 
+            <button type="submit" class="btn btn-primary w-100">Create Account</button>
+          </form>
+
+          <div class="mt-3 text-center">
+            Already have an account? <a href="login.php">Log in</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<?php include 'footer.php'; ?>
+</body>

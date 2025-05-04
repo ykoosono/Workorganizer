@@ -1,6 +1,15 @@
 <?php
 include 'header.php';
 
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
+// Database connection details
 $host = 'localhost';
 $db = 'workorganizer_db'; // ✅ corrected name
 $user = 'root'; // ← replace with your actual DB username
@@ -8,11 +17,14 @@ $pass = ''; // ← replace with your actual DB password
 $pdo = null;
 
 try {
-  $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
-  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-  die("Database connection failed: " . $e->getMessage());
+    die("Database connection failed: " . $e->getMessage());
 }
+
+// Get the logged-in user's ID
+$user_id = $_SESSION['user_id'];
 ?>
 
 <div class="d-flex flex-column min-vh-100">
@@ -51,9 +63,9 @@ try {
       <!-- Calendars grid -->
       <div class="row row-cols-1 row-cols-md-3 g-4">
         <?php
-        // Fetch calendar
-        $stmt = $pdo->prepare("SELECT * FROM calendars");
-        $stmt->execute();
+        // Fetch calendars that belong to the logged-in user
+        $stmt = $pdo->prepare("SELECT * FROM calendars WHERE user_id = ?");
+        $stmt->execute([$user_id]);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if ($results):
