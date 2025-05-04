@@ -1,28 +1,26 @@
 <?php
-// Database connection
-$host = 'localhost';
-$db = 'workorganizer_db';
-$user = 'root';
-$pass = '';
+// DB connection
+$pdo = new PDO("mysql:host=localhost;dbname=workorganizer_db;charset=utf8mb4", 'root', '');
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    // Prepare and execute query
-    $stmt = $pdo->prepare("SELECT id, title, date AS start, details AS description FROM events WHERE calendar_id = :calendar_id");
-    $stmt->bindParam(':calendar_id', $_GET['calendar_id'], PDO::PARAM_INT);
-    $stmt->execute();
-
-    // Fetch events
-    $events = [];
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $events[] = $row;
-    }
-
-    // Output events as JSON
-    echo json_encode($events);
-} catch (PDOException $e) {
-    echo json_encode(['error' => $e->getMessage()]);
+$calendarId = $_GET['calendar_id'] ?? null;
+if (!$calendarId) {
+    echo json_encode([]);
+    exit;
 }
-?>
+
+$stmt = $pdo->prepare("SELECT id, title, date, is_complete FROM events WHERE calendar_id = ?");
+$stmt->execute([$calendarId]);
+$events = [];
+
+foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+    $events[] = [
+        'id' => $row['id'],
+        'title' => $row['title'],
+        'start' => $row['date'],
+        'color' => $row['is_complete'] ? '#28a745' : '#ffc107'  // green for complete, amber for incomplete
+    ];
+}
+
+header('Content-Type: application/json');
+echo json_encode($events);

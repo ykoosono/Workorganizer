@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="a661ada8-30cc-46ad-ae14-a621ad761c94" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fetch_events.php" beforeDir="false" afterPath="$PROJECT_DIR$/fetch_events.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/view_calendar.php" beforeDir="false" afterPath="$PROJECT_DIR$/view_calendar.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,8 +20,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/view_calendar.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="629">
-              <caret line="198" selection-start-line="198" selection-end-line="198" />
+            <state relative-caret-position="364">
+              <caret line="138" selection-start-line="138" selection-end-line="138" />
             </state>
           </provider>
         </entry>
@@ -28,8 +29,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/fetch_events.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="28" selection-start-line="28" selection-end-line="28" />
+            <state relative-caret-position="442">
+              <caret line="26" selection-start-line="26" selection-end-line="26" />
             </state>
           </provider>
         </entry>
@@ -126,6 +127,7 @@
       <find>bac</find>
       <find>html</find>
       <find>add ta</find>
+      <find>Complete Tasks</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -329,7 +331,14 @@
       <option name="project" value="LOCAL" />
       <updated>1746396711079</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="05/4 commit5">
+      <created>1746400625241</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1746400625241</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -412,7 +421,8 @@
     <MESSAGE value="05/4 commit2" />
     <MESSAGE value="05/4 commit3" />
     <MESSAGE value="05/4 commit4" />
-    <option name="LAST_COMMIT_MESSAGE" value="05/4 commit4" />
+    <MESSAGE value="05/4 commit5" />
+    <option name="LAST_COMMIT_MESSAGE" value="05/4 commit5" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/forgot_password.txt" />
@@ -598,15 +608,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/fetch_events.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="28" selection-start-line="28" selection-end-line="28" />
+        <state relative-caret-position="442">
+          <caret line="26" selection-start-line="26" selection-end-line="26" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/view_calendar.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="629">
-          <caret line="198" selection-start-line="198" selection-end-line="198" />
+        <state relative-caret-position="364">
+          <caret line="138" selection-start-line="138" selection-end-line="138" />
         </state>
       </provider>
     </entry>

@@ -118,12 +118,78 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
     <h2 class="mb-3"><?= htmlspecialchars($calendar['title']) ?></h2>
     <p class="text-muted"><?= htmlspecialchars($calendar['description']) ?></p>
 
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">Calendar</div>
-        <div class="card-body">
-            <div id="calendar"></div>
-        </div>
-    </div>
+   <div class="row">
+       <div class="col-md-6">
+           <div class="card mb-4">
+               <div class="card-header bg-primary text-white">Calendar</div>
+               <div class="card-body">
+                   <div id="calendar"></div>
+                   <!-- Color Legend -->
+                   <div class="mt-3">
+                       <h6>Legend:</h6>
+                       <div class="d-flex align-items-center mb-2">
+                           <div style="width: 20px; height: 20px; background-color: #28a745; margin-right: 10px;"></div>
+                           <span>Completed Task</span>
+                       </div>
+                       <div class="d-flex align-items-center">
+                           <div style="width: 20px; height: 20px; background-color: #ffc107; margin-right: 10px;"></div>
+                           <span>Incomplete Task</span>
+                       </div>
+                   </div>
+
+               </div>
+           </div>
+       </div>
+
+       <div class="col-md-6">
+           <!-- Incomplete Tasks -->
+           <h4>Incomplete Tasks</h4>
+           <?php if ($incompleteEvents): ?>
+               <ul class="list-group mb-4">
+               <?php foreach ($incompleteEvents as $event): ?>
+                   <li class="list-group-item d-flex justify-content-between">
+                       <div>
+                           <strong><?= htmlspecialchars($event['title']) ?></strong><br>
+                           <small><?= htmlspecialchars($event['date']) ?></small>
+                           <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
+                       </div>
+                       <div>
+                           <button class="btn btn-sm btn-success toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="1">Complete</button>
+                           <a href="?id=<?= $calendarId ?>&edit_event=<?= $event['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
+                           <a href="?id=<?= $calendarId ?>&delete_event=<?= $event['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete?');">Delete</a>
+                       </div>
+                   </li>
+               <?php endforeach; ?>
+               </ul>
+           <?php else: ?>
+               <p>No incomplete tasks found.</p>
+           <?php endif; ?>
+
+           <!-- Complete Tasks -->
+           <h4>Completed Tasks</h4>
+           <?php if ($completeEvents): ?>
+               <ul class="list-group mb-4">
+               <?php foreach ($completeEvents as $event): ?>
+                   <li class="list-group-item d-flex justify-content-between">
+                       <div>
+                           <strong><?= htmlspecialchars($event['title']) ?></strong><br>
+                           <small><?= htmlspecialchars($event['date']) ?></small>
+                           <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
+                       </div>
+                       <div>
+                           <button class="btn btn-sm btn-secondary toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="0">Undo</button>
+                           <a href="?id=<?= $calendarId ?>&edit_event=<?= $event['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
+                           <a href="?id=<?= $calendarId ?>&delete_event=<?= $event['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete?');">Delete</a>
+                       </div>
+                   </li>
+               <?php endforeach; ?>
+               </ul>
+           <?php else: ?>
+               <p>No completed tasks found.</p>
+           <?php endif; ?>
+       </div>
+   </div>
+
 
     <script>
     $(function () {
@@ -159,51 +225,6 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
     });
     </script>
 
-    <!-- Incomplete Tasks -->
-    <h4>Incomplete Tasks</h4>
-    <?php if ($incompleteEvents): ?>
-        <ul class="list-group mb-4">
-        <?php foreach ($incompleteEvents as $event): ?>
-            <li class="list-group-item d-flex justify-content-between">
-                <div>
-                    <strong><?= htmlspecialchars($event['title']) ?></strong><br>
-                    <small><?= htmlspecialchars($event['date']) ?></small>
-                    <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-success toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="1">Complete</button>
-                    <a href="?id=<?= $calendarId ?>&edit_event=<?= $event['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
-                    <a href="?id=<?= $calendarId ?>&delete_event=<?= $event['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete?');">Delete</a>
-                </div>
-            </li>
-        <?php endforeach; ?>
-        </ul>
-    <?php else: ?>
-        <p>No incomplete tasks found.</p>
-    <?php endif; ?>
-
-    <!-- Complete Tasks -->
-    <h4>Complete Tasks</h4>
-    <?php if ($completeEvents): ?>
-        <ul class="list-group mb-4">
-        <?php foreach ($completeEvents as $event): ?>
-            <li class="list-group-item d-flex justify-content-between">
-                <div>
-                    <strong><?= htmlspecialchars($event['title']) ?></strong><br>
-                    <small><?= htmlspecialchars($event['date']) ?></small>
-                    <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-secondary toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="0">Undo</button>
-                    <a href="?id=<?= $calendarId ?>&edit_event=<?= $event['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
-                    <a href="?id=<?= $calendarId ?>&delete_event=<?= $event['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete?');">Delete</a>
-                </div>
-            </li>
-        <?php endforeach; ?>
-        </ul>
-    <?php else: ?>
-        <p>No completed tasks found.</p>
-    <?php endif; ?>
 
     <!-- Add/Edit Task -->
     <h4><?= $editingEvent ? 'Edit Task' : 'Add New Task' ?></h4>
