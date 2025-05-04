@@ -1,5 +1,5 @@
 <?php
-include 'db_connection.php';
+include 'workorganizer_db';
 
 if (isset($_POST['id'])) {
     $id = $_POST['id'];

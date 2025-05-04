@@ -1,19 +1,15 @@
 <?php
-include 'workorganizer_db';
+// Include database connection
+require_once 'workorganizer_db';
 
-$query = "SELECT id, title, start_event, end_event FROM events";
-$stmt = $pdo->prepare($query);
-$stmt->execute();
+header('Content-Type: application/json');
 
-$events = [];
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $events[] = [
-        'id' => $row['id'],
-        'title' => $row['title'],
-        'start' => $row['start_event'],
-        'end' => $row['end_event']
-    ];
-}
+// Fetch events from the database
+$stmt = $pdo->prepare("SELECT id, title, date AS start, details FROM events WHERE calendar_id = ? AND is_complete = 0 ORDER BY date ASC");
+$stmt->execute([$_GET['id']]);
+$events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Return events as JSON
 echo json_encode($events);
 ?>
+
