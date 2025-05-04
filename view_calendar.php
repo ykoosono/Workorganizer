@@ -210,9 +210,8 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
 
       <!-- Navigation -->
       <div class="mt-4">
-        <a href="view_calendar.php?id=<?php echo $calendarId; ?>" class="btn btn-primary">Back to Calendar</a>
-        <a href="assign_task_form.php?id=<?php echo $calendarId; ?>" class="btn btn-success">Assign Tasks</a>
         <a href="homepage.php" class="btn btn-primary">Back to My Calendars</a>
+        <a href="assign_task_form.php?id=<?php echo $calendarId; ?>" class="btn btn-success">Assign Tasks</a>
         <a href="edit-calendar.php?id=<?php echo $calendarId; ?>" class="btn btn-warning">Edit Calendar</a>
         <a href="add-member.php?id=<?php echo $calendarId; ?>" class="btn btn-success">Add Member</a>
         <a href="remove-member.php?id=<?php echo $calendarId; ?>" class="btn btn-danger">Remove Member</a>
