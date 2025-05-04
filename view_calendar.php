@@ -41,6 +41,7 @@ if (!$calendar) {
     exit;
 }
 
+
 // Fetch user role
 $stmt = $pdo->prepare("SELECT r.role_name FROM users_calendars uc JOIN roles r ON uc.role_id = r.id WHERE uc.user_id = ? AND uc.calendar_id = ?");
 $stmt->execute([$userId, $calendarId]);
@@ -105,7 +106,137 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
 ?>
 
 <div class="d-flex flex-column min-vh-100">
+<!-- Include FullCalendar CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.css" rel="stylesheet" />
+
+<!-- Include jQuery and FullCalendar JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+
+<div id="calendar"></div>
+
+<script>
+$(document).ready(function() {
+    $('#calendar').fullCalendar({
+        events: 'get_tasks.php',
+        editable: true,
+        droppable: true,
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        defaultView: 'month',
+        eventClick: function(event) {
+            alert('Task: ' + event.title + '\nStarts: ' + event.start.format());
+        },
+        eventDrop: function(event, delta) {
+            alert(event.title + ' was moved ' + delta + ' days');
+        }
+    });
+});
+</script>
+<script>
+$(document).ready(function() {
+    var calendar = $('#calendar').fullCalendar({
+        events: 'get_events.php',
+        editable: true,
+        droppable: true,
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        defaultView: 'month',
+        eventClick: function(event) {
+            if (confirm('Are you sure you want to delete this event?')) {
+                $.ajax({
+                    url: 'delete_event.php',
+                    type: 'POST',
+                    data: { id: event.id },
+                    success: function(response) {
+                        if (response.trim() === 'success') {
+                            $('#calendar').fullCalendar('removeEvents', event.id);
+                        } else {
+                            alert('Failed to delete event.');
+                        }
+                    }
+                });
+            }
+        },
+        eventDrop: function(event) {
+            $.ajax({
+                url: 'update_event.php',
+                type: 'POST',
+                data: {
+                    id: event.id,
+                    title: event.title,
+                    start: event.start.format(),
+                    end: event.end.format()
+                },
+                success: function(response) {
+                    if (response.trim() !== 'success') {
+                        alert('Failed to update event.');
+                    }
+                }
+            });
+        },
+        select: function(start, end) {
+            var title = prompt('Enter event title:');
+            if (title) {
+                $.ajax({
+                    url: 'insert_event.php',
+                    type: 'POST',
+                    data: {
+                        title: title,
+                        start: start.format(),
+                        end: end.format()
+                    },
+                    success: function(response) {
+                        if (response.trim() === 'success') {
+                            $('#calendar').fullCalendar('refetchEvents');
+                        } else {
+                            alert('Failed to add event.');
+                        }
+                    }
+                });
+            }
+            $('#calendar').fullCalendar('unselect');
+        }
+    });
+});
+</script>
+
+
   <main class="flex-grow-1">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      My Calendar Widget
+    </div>
+    <div class="card-body">
+      <div id="calendar"></div>
+    </div>
+  </div>
+<style>
+#calendar {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 0.85rem;
+}
+.fc {
+    font-family: "Segoe UI", sans-serif;
+}
+.fc-event {
+    cursor: pointer;
+}
+</style>
+
+
+<div id="calendar"></div>
+
+  <div id="calendar"></div>
+
     <div class="container mt-5">
       <h2 class="mb-3"><?php echo htmlspecialchars($calendar['title']); ?></h2>
       <p class="text-muted"><?php echo htmlspecialchars($calendar['description']); ?></p>
@@ -217,9 +348,30 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
         <a href="remove-member.php?id=<?php echo $calendarId; ?>" class="btn btn-danger">Remove Member</a>
       </div>
     </div>
+
+
   </main>
   <?php include 'footer.php'; ?>
 </div>
+<div id="calendar"></div>
+
+<script>
+$(document).ready(function() {
+    $('#calendar').fullCalendar({
+        events: 'get_events.php',
+        editable: true,
+        droppable: true, // Enable dragging and dropping
+        eventDrop: function(event, delta) {
+            // Handle event drop (e.g., update event in database)
+            alert(event.title + ' was moved ' + delta + ' days');
+        },
+        eventClick: function(calEvent, jsEvent, view) {
+            // Handle event click (e.g., show event details)
+            alert('Event: ' + calEvent.title);
+        }
+    });
+});
+</script>
 
 <!-- AJAX Script for Toggle Completion -->
 <script>
@@ -247,4 +399,6 @@ document.querySelectorAll('.toggle-complete').forEach(button => {
   });
 });
 </script>
+
+
 
