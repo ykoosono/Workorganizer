@@ -35,17 +35,17 @@ if (!$calendar) {
 }
 
 $stmt = $pdo->prepare("
-    SELECT r.role_name
-    FROM users_calendars uc
-    JOIN roles r ON uc.role_id = r.id
-    WHERE uc.user_id = ? AND uc.calendar_id = ?
+    SELECT rp.permission_id
+    FROM role_permissions rp
+    JOIN users_calendars uc
+    ON uc.role_id = rp.role_id
+    WHERE uc.calendar_id = ? AND uc.user_id = ?
 ");
-$stmt->execute([$userId, $calendarId]);
-$userRole = $stmt->fetchColumn();
+$stmt->execute([$calendarId, $userId]);
+$userRolePermission = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-if ($userRole === 'viewer') {
+if (in_array(6, $userRolePermission)) {
     echo "<div class='container mt-5'><div class='alert alert-warning'>You have view-only access to this calendar.</div></div>";
-    include 'footer.php'; exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -75,9 +75,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-$incompleteEvents = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 0 ORDER BY date ASC");
+$incompleteEvents = $pdo->prepare("
+    SELECT e.*, u.name AS assigned_to
+    FROM events e
+    LEFT JOIN task_assignments ta ON e.id = ta.event_id
+    LEFT JOIN users u ON ta.user_id = u.user_id
+    WHERE e.calendar_id = ? AND e.is_complete = 0
+    ORDER BY e.date ASC
+");
 $incompleteEvents->execute([$calendarId]);
 $incompleteEvents = $incompleteEvents->fetchAll(PDO::FETCH_ASSOC);
+
+$completeEvents = $pdo->prepare("
+    SELECT e.*, u.name AS assigned_to
+    FROM events e
+    LEFT JOIN task_assignments ta ON e.id = ta.event_id
+    LEFT JOIN users u ON ta.user_id = u.user_id
+    WHERE e.calendar_id = ? AND e.is_complete = 1
+    ORDER BY e.date ASC
+");
+$completeEvents->execute([$calendarId]);
+$completeEvents = $completeEvents->fetchAll(PDO::FETCH_ASSOC);
+
 
 $completeEvents = $pdo->prepare("SELECT * FROM events WHERE calendar_id = ? AND is_complete = 1 ORDER BY date ASC");
 $completeEvents->execute([$calendarId]);
@@ -97,6 +116,7 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
     <meta charset="UTF-8">
     <title>Calendar</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -155,11 +175,30 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
                             <strong><?= htmlspecialchars($event['title']) ?></strong><br>
                             <small><?= htmlspecialchars($event['date']) ?></small>
                             <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
+                            <?php if (!empty($event['assigned_to'])): ?>
+                                <small class="text-muted">Assigned to: <?= htmlspecialchars($event['assigned_to']) ?></small>
+                            <?php endif; ?>
+
                         </div>
                         <div>
-                            <button class="btn btn-sm btn-success toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="1">Complete</button>
-                            <a href="?id=<?= $calendarId ?>&edit_event=<?= $event['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
-                            <a href="?id=<?= $calendarId ?>&delete_event=<?= $event['id'] ?>" class="btn btn-sm btn-danger">Delete</a>
+                        <?php if(in_array(5, $userRolePermission)) {
+                            echo '<button class="btn btn-sm btn-success toggle-complete" data-event-id="'.$event['id'].'" data-status="1" title="Mark Complete">
+                                <i class="bi bi-check-circle"></i>
+                            </button>';
+                            }
+
+                             if(in_array(4, $userRolePermission)) {
+                            echo '<a href="?id='.$calendarId.'&edit_event='.$event['id'].'" class="btn btn-sm btn-outline-primary" title="Edit">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>';
+                             }
+
+                            if(in_array(8, $userRolePermission)) {
+                            echo '<a href="?id='.$calendarId.'&delete_event='.$event['id'].'" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </a>';
+                            }
+                            ?>
                         </div>
                     </li>
                 <?php endforeach; ?>
@@ -176,12 +215,34 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
                         <div>
                             <strong><?= htmlspecialchars($event['title']) ?></strong><br>
                             <small><?= htmlspecialchars($event['date']) ?></small>
-                            <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
+                           <p><?= nl2br(htmlspecialchars($event['details'])) ?></p>
+                           <?php if (!empty($event['assigned_to'])): ?>
+                               <small class="text-muted">Assigned to: <?= htmlspecialchars($event['assigned_to']) ?></small>
+                           <?php endif; ?>
+
                         </div>
                         <div>
-                            <button class="btn btn-sm btn-secondary toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="0">Undo</button>
-                            <a href="?id=<?= $calendarId ?>&edit_event=<?= $event['id'] ?>" class="btn btn-sm btn-primary">Edit</a>
-                            <a href="?id=<?= $calendarId ?>&delete_event=<?= $event['id'] ?>" class="btn btn-sm btn-danger">Delete</a>
+                        <?php if(in_array(5, $userRolePermission)) {?>
+                            <button class="btn btn-sm btn-secondary toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="0" title="Mark Incomplete">
+                                <i class="bi bi-arrow-counterclockwise"></i>
+                            </button>
+                            <?php } ?>
+                            <?php
+
+                             if(in_array(4, $userRolePermission)) {
+                             echo "Hello World!";
+                            echo '<a href="?id='.$calendarId.'&edit_event='.$event['id'].'" class="btn btn-sm btn-outline-primary" title="Edit">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>';
+                            }
+                            if(in_array(8, $userRolePermission)) {
+                                                        echo '<a href="?id='.$calendarId.'&delete_event='.$event['id'].'" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                            <i class="bi bi-trash"></i>
+                                                        </a>';
+                            }
+                            ?>
+
+
                         </div>
                     </li>
                 <?php endforeach; ?>
@@ -225,8 +286,13 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
         });
     });
     </script>
+    <?php
 
-    <h4><?= $editingEvent ? 'Edit Task' : 'Add New Task' ?></h4>
+    if(in_array(7, $userRolePermission)){
+    ?>
+    <h4><?= $editingEvent ? 'Edit Task' : 'Add New Task'
+    ?>
+    </h4>
     <form method="POST" action="view_calendar.php?id=<?= $calendarId ?>">
         <input type="hidden" name="event_id" value="<?= $editingEvent['id'] ?? '' ?>">
         <div class="mb-3">
@@ -243,32 +309,41 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
             <label>Details</label>
             <textarea name="details" class="form-control"><?= htmlspecialchars($editingEvent['details'] ?? '') ?></textarea>
         </div>
-        <div class="mb-3">
-            <label>Assign To</label>
-            <select name="assigned_user_id" class="form-control">
-                <option value="">-- None --</option>
-                <?php
-                $stmt = $pdo->query("SELECT user_id as id, name FROM users");
-                foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $user) {
-                    $selected = ($editingEvent['assigned_user_id'] ?? '') == $user['id'] ? 'selected' : '';
-                    echo "<option value='{$user['id']}' $selected>{$user['name']}</option>";
-                }
-                ?>
-            </select>
-        </div>
-        <button class="btn btn-<?= $editingEvent ? 'primary' : 'success' ?>"><?= $editingEvent ? 'Update' : 'Add' ?> Task</button>
-        <?php if ($editingEvent): ?>
-            <a href="view_calendar.php?id=<?= $calendarId ?>" class="btn btn-secondary">Cancel</a>
-        <?php endif; ?>
-    </form>
+        <?php
+            if(in_array(3, $userRolePermission)) {
 
+           ?>
+            <div class="mb-3">
+                <label>Assign To</label>
+                <select name="assigned_user_id" class="form-control">
+                    <option value="">-- None --</option>
+                    <?php
+                    $stmt = $pdo->query("SELECT user_id as id, name FROM users");
+                    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $user) {
+                        $selected = ($editingEvent['assigned_user_id'] ?? '') == $user['id'] ? 'selected' : '';
+                        echo "<option value='{$user['id']}' $selected>{$user['name']}</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+        <?php
+        }
+        ?>
+            <button class="btn btn-<?= $editingEvent ? 'primary' : 'success' ?>"><?= $editingEvent ? 'Update' : 'Add' ?> Task</button>
+            <?php if ($editingEvent): ?>
+                <a href="view_calendar.php?id=<?= $calendarId ?>" class="btn btn-secondary">Cancel</a>
+            <?php endif; ?>
+
+    </form>
+<?php }; ?>
     <hr>
     <div class="mt-4 d-flex flex-wrap gap-2">
         <a href="homepage.php" class="btn btn-outline-primary">Back</a>
-        <a href="assign_task_form.php?id=<?= $calendarId ?>" class="btn btn-outline-success">Assign Tasks</a>
-        <a href="edit-calendar.php?id=<?= $calendarId ?>" class="btn btn-outline-warning">Edit Calendar</a>
-        <a href="add-member.php?id=<?= $calendarId ?>" class="btn btn-outline-info">Add Member</a>
-        <a href="remove-member.php?id=<?= $calendarId ?>" class="btn btn-outline-danger">Remove Member</a>
+        <?php if(in_array(1, $userRolePermission)) { ?>
+            <a href="add-member.php?id=<?= $calendarId ?>" class="btn btn-outline-info">Add Member</a>
+            <?php if(in_array(2, $userRolePermission)) { ?>
+                <a href="remove-member.php?id=<?= $calendarId ?>" class="btn btn-outline-danger">Remove Member</a>
+            <?php } } ?>
     </div>
 </main>
 
@@ -308,7 +383,7 @@ document.querySelectorAll('.toggle-complete').forEach(btn => {
   </div>
 </div>
 <script>
-document.querySelectorAll('.btn-danger[href*="delete_event"]').forEach(btn => {
+document.querySelectorAll('.btn-outline-danger[href*="delete_event"]').forEach(btn => {
     btn.addEventListener('click', function (e) {
         e.preventDefault();
         document.getElementById('confirmDeleteBtn').href = this.href;

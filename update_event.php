@@ -1,6 +1,10 @@
 <?php
-include 'workorganizer_db';
-
+$host = 'localhost';
+$db = 'workorganizer_db';
+$user = 'root';
+$pass = '';
+$pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 if (isset($_POST['id'], $_POST['title'], $_POST['start'], $_POST['end'])) {
     $id = $_POST['id'];
     $title = $_POST['title'];

@@ -81,6 +81,7 @@ $(document).ready(function() {
 
 
     <div class="container mt-5">
+      <h1 class="mb-4">Welcome <?php echo $_SESSION['name'] ?></h1>
       <h2 class="mb-4">My Calendars</h2>
 
       <!-- Functional Buttons -->
@@ -115,7 +116,17 @@ $(document).ready(function() {
       <div class="row row-cols-1 row-cols-md-3 g-4">
         <?php
         // Fetch calendars that belong to the logged-in user
-        $stmt = $pdo->prepare("SELECT * FROM calendars WHERE user_id = ?");
+        $stmt = $pdo->prepare("
+
+
+            SELECT cal.*, r.role_name FROM calendars cal
+            JOIN users_calendars uc
+            ON cal.id = uc.calendar_id
+            JOIN roles r
+            ON uc.role_id = r.id
+            WHERE
+            uc.user_id = ?
+            ");
         $stmt->execute([$user_id]);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -127,6 +138,7 @@ $(document).ready(function() {
                         <div class="card-body">
                             <h5 class="card-title"><?php echo htmlspecialchars($row['title']); ?></h5>
                             <p class="card-text"><?php echo htmlspecialchars($row['description']); ?></p>
+                            <p class="card-text"><?php echo htmlspecialchars($row['role_name']); ?></p>
                             <!-- Ensure the link goes to view_calendar.php with the correct calendar ID -->
                             <a href="view_calendar.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Calendar</a>
                         </div>
