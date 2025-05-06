@@ -1,35 +1,16 @@
-
 <?php
-$host = "localhost";
-$dbname2 = "workorganizer_db";
-$username2 = "root";
-$password2 = "";
+// Database credentials
+$host     = 'localhost';
+$username = 'root';        // Change if using a different user
+$password = '';            // Change if your MySQL user has a password
+$dbname   = 'workorganizer_db';
 
-// Create connection
-$conn2 = new mysqli($host, $username2, $password2, $dbname2);
+// Create the database connection
+$conn = new mysqli($host, $username, $password, $dbname);
 
-// Check connection
-if ($conn2->connect_error) {
-    die("Connection failed: " . $conn2->connect_error);
-}
-
-$servername = "localhost";
-$username = "mahadev";
-$password = "mahadev";
-$dbname = "workorganizer_db";
-$conn;
-
-// Internal APIs 
-function openDB() {
-  global $servername, $username, $password, $dbname, $conn;
-
-// Create connection
-  $conn = new mysqli($servername, $username, $password, $dbname);
-  if ($conn->connect_error) {
-        return $conn->connect_error;
-    } else {
-        return "Connected";
-    }
+// Check connection and handle errors
+if ($conn->connect_error) {
+    die("Database connection failed: " . $conn->connect_error);
 }
 
 function closeDB() {
@@ -108,5 +89,4 @@ function loginDB($sql, $user, $pwd) {
   }
   return $message;
 }
-?>
 
