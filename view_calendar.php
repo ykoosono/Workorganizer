@@ -26,7 +26,11 @@ if (!$calendarId) {
     include 'footer.php'; exit;
 }
 
-$stmt = $pdo->prepare("SELECT * FROM calendars WHERE id = ? AND user_id = ?");
+$stmt = $pdo->prepare("
+SELECT * FROM calendars c
+JOIN users_calendars uc
+ON c.id = uc.calendar_id
+WHERE c.id = ? AND uc.user_id = ?");
 $stmt->execute([$calendarId, $userId]);
 $calendar = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$calendar) {
@@ -169,7 +173,7 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
             <h4>Incomplete Tasks</h4>
             <?php if ($incompleteEvents): ?>
                 <ul class="list-group mb-4">
-                <?php foreach ($incompleteEvents as $event): ?>
+                <?php foreach($incompleteEvents as $event): ?>
                     <li class="list-group-item d-flex justify-content-between align-items-start animate__animated animate__fadeIn">
                         <div>
                             <strong><?= htmlspecialchars($event['title']) ?></strong><br>
