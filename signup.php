@@ -14,54 +14,50 @@
   <!-- Sign Up Form -->
   <div class="container my-5">
     <div class="row justify-content-center">
-      <div class="col-md-8 col-lg-6">
+      <div class="col-md-6 col-lg-5">
         <div class="card p-4 shadow-lg rounded">
-          <h2 class="text-center mb-3">Sign Up</h2>
-          <p class="text-center mb-4">Please complete the form to create an account.</p>
+          <h2 class="text-center mb-4">Sign Up</h2>
 
-          <form name="signup" action="signupAction.php" class="was-validated">
-                <div class="row">    
-                    <div class="col-sm-6">
-                        <label for="user" class="form-label">Username:</label>
-                        <input class="form-control" placeholder="Enter username" name="user" size="40" required>
-                        <div class="valid-feedback">Valid.</div>
-                        <div class="invalid-feedback">Please fill out this field.</div>
-                    </div>
-                     <div class="col-sm-6">
-                        <label for="pswd" class="form-label">Password:</label>
-                        <input type="password" class="form-control" placeholder="Enter password" name="pswd" required>
-                        <div class="valid-feedback">Valid.</div>
-                        <div class="invalid-feedback">Please fill out this field.</div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <label for="email" class="form-label">Email:</label>
-                        <input class="form-control" placeholder="Email address" name="email" required>
-                        <div class="valid-feedback">Valid.</div>
-                        <div class="invalid-feedback">Please fill out this field.</div>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="pswd2" class="form-label">Confirm Password:</label>
-                        <input type="password" class="form-control" placeholder="Confirm password" name="pswd2" required>
-                        <div class="valid-feedback">Valid.</div>
-                        <div class="invalid-feedback">Please fill out this field.</div>
-                    </div>
-                </div>
+          <?php if (!empty($errors)): ?>
+            <div class="alert alert-danger">
+              <?php foreach ($errors as $error): ?>
+                <div><?php echo htmlspecialchars($error); ?></div>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
 
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-primary">Submit</button>
-              <button type="reset" class="btn btn-secondary">Reset</button>
+          <form method="POST" action="signup.php">
+            <div class="mb-3">
+              <label for="name" class="form-label">Full Name</label>
+              <input type="text" name="name" id="name" class="form-control" required value="<?php echo htmlspecialchars($name); ?>">
             </div>
 
-            <div class="text-center mt-3">
-              <p>Already have an account? <a href="login.php">Sign in</a></p>
+            <div class="mb-3">
+              <label for="email" class="form-label">Email Address</label>
+              <input type="email" name="email" id="email" class="form-control" required value="<?php echo htmlspecialchars($email); ?>">
             </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" name="password" id="password" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="confirm_password" class="form-label">Confirm Password</label>
+              <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Create Account</button>
           </form>
+
+          <div class="mt-3 text-center">
+            Already have an account? <a href="login.php">Log in</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</main>
 
     <?php include 'footer.php' ?>
 
@@ -81,5 +77,5 @@
       })
     })()
   </script>
+
 </body>
-</html>

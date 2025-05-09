@@ -22,6 +22,7 @@
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
           <a class="nav-link" href="addCalendar.php">New Calendar</a>
+
         </li>
       </ul>
       <ul class="navbar-nav ms-auto">
