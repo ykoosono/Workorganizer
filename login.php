@@ -40,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <?php include 'header.php'; ?>
 
 <body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">

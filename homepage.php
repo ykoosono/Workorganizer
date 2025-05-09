@@ -1,26 +1,60 @@
 <?php
 include 'header.php';
-
+include('DBConnect.php'); 
 session_start();
 
-// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
-    exit;
+    header("Location: login.php");
+    exit();
 }
 
-// Database connection details
-$host = 'localhost';
-$db = 'workorganizer_db'; // ✅ corrected name
-$user = 'root'; // ← replace with your actual DB username
-$pass = ''; // ← replace with your actual DB password
-$pdo = null;
+$userId = (int) $_SESSION['user_id'];
+$sort = $_GET['sort'] ?? 'default';
+$query = $_GET['query'] ?? '';
+$likeQuery = '%' . $query . '%';
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+$sortOptions = [
+    'alpha' => 'calendar_name ASC',
+    'recent' => 'start_date DESC',
+    'default' => 'id ASC',
+];
+
+$orderBy = $sortOptions[$sort] ?? $sortOptions['default'];
+
+$sql = "
+    SELECT * FROM (
+        SELECT c.id, c.calendar_name, c.start_date, 'Lead' AS role_label
+        FROM users_calendars uc
+        JOIN calendar c ON uc.calendar_id = c.id
+        WHERE uc.user_id = ? AND uc.role_id = 1 AND c.calendar_name LIKE ?
+
+        UNION ALL
+
+        SELECT c.id, c.calendar_name, c.start_date, 'Member' AS role_label
+        FROM users_calendars uc
+        JOIN calendar c ON uc.calendar_id = c.id
+        WHERE uc.user_id = ? AND uc.role_id = 2 AND c.calendar_name LIKE ?
+
+        UNION ALL
+
+        SELECT c.id, c.calendar_name, c.start_date, 'Viewer' AS role_label
+        FROM users_calendars uc
+        JOIN calendar c ON uc.calendar_id = c.id
+        WHERE uc.user_id = ? AND uc.role_id = 3 AND c.calendar_name LIKE ?
+    ) AS all_calendars
+    ORDER BY $orderBy
+";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("isisis", $userId, $likeQuery, $userId, $likeQuery, $userId, $likeQuery);
+$stmt->execute();
+$calendars = $stmt->get_result();
+
+// Debugging step: Check the SQL query result.
+if ($calendars->num_rows == 0) {
+    echo "<p>No calendars found. Please check your data and query parameters.</p>";
+} else {
+    echo "<p>Calendars found: " . $calendars->num_rows . "</p>";
 }
 
 // Get the logged-in user's ID
@@ -98,15 +132,17 @@ $(document).ready(function() {
               Sort Calendars
             </button>
             <ul class="dropdown-menu w-100">
-              <li><a class="dropdown-item" href="?sort=recent">Most Recent</a></li>
-              <li><a class="dropdown-item" href="?sort=alpha">Alphabetically</a></li>
+              <li><a class="dropdown-item <?= $sort === 'default' ? 'active' : '' ?>" href="?sort=default&query=<?= urlencode($query) ?>">Default</a></li>
+              <li><a class="dropdown-item <?= $sort === 'recent' ? 'active' : '' ?>" href="?sort=recent&query=<?= urlencode($query) ?>">Most Recent</a></li>
+              <li><a class="dropdown-item <?= $sort === 'alpha' ? 'active' : '' ?>" href="?sort=alpha&query=<?= urlencode($query) ?>">Alphabetically</a></li>
             </ul>
           </div>
         </div>
 
         <div class="col-md-4">
-          <form class="d-flex" action="search-calendars.php" method="get">
-            <input class="form-control me-2" type="search" name="query" placeholder="Search calendars..." aria-label="Search">
+          <form class="d-flex" action="" method="get">
+            <input class="form-control me-2" type="search" name="query" placeholder="Search calendars..." value="<?= htmlspecialchars($query) ?>" aria-label="Search">
+            <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
             <button class="btn btn-primary" type="submit">Search</button>
           </form>
         </div>
@@ -115,41 +151,24 @@ $(document).ready(function() {
       <!-- Calendars grid -->
       <div class="row row-cols-1 row-cols-md-3 g-4">
         <?php
-        // Fetch calendars that belong to the logged-in user
-        $stmt = $pdo->prepare("
-
-
-            SELECT cal.*, r.role_name FROM calendars cal
-            JOIN users_calendars uc
-            ON cal.id = uc.calendar_id
-            JOIN roles r
-            ON uc.role_id = r.id
-            WHERE
-            uc.user_id = ?
-            ");
-        $stmt->execute([$user_id]);
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        if ($results):
-            foreach ($results as $row):
-        ?>
-                <div class="col">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h5 class="card-title"><?php echo htmlspecialchars($row['title']); ?></h5>
-                            <p class="card-text"><?php echo htmlspecialchars($row['description']); ?></p>
-                            <p class="card-text"><?php echo htmlspecialchars($row['role_name']); ?></p>
-                            <!-- Ensure the link goes to view_calendar.php with the correct calendar ID -->
-                            <a href="view_calendar.php?id=<?php echo $row['id']; ?>" class="btn btn-primary">View Calendar</a>
-                        </div>
-                    </div>
+        function renderCalendarCard($calendarId, $calendarName, $roleLabel) {
+            echo '
+            <div class="col">
+              <div class="card shadow-sm h-100">
+                <div class="card-body">
+                  <h5 class="card-title">'.htmlspecialchars($calendarName).'</h5>
+                  <p class="card-text">Role: '.htmlspecialchars($roleLabel).'</p>
+                  <a href="view-calendar.php?id=' . urlencode($calendarId) . '" class="btn btn-primary">View Calendar</a>
                 </div>
-        <?php
-            endforeach;
-        else:
+              </div>
+            </div>';
+        }
+
+        // Loop through the result set and render the cards
+        while ($row = $calendars->fetch_assoc()) {
+            renderCalendarCard($row['id'], $row['calendar_name'], $row['role_label']);
+        }
         ?>
-            <p>No calendars found.</p>
-        <?php endif; ?>
       </div>
     </div>
   </main>
