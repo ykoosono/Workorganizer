@@ -17,34 +17,33 @@
       <div class="col-md-6 col-lg-5">
         <div class="card p-4 shadow-lg rounded">
           <h2 class="text-center mb-4">Sign Up</h2>
-
-          <?php if (!empty($errors)): ?>
-            <div class="alert alert-danger">
-              <?php foreach ($errors as $error): ?>
-                <div><?php echo htmlspecialchars($error); ?></div>
-              <?php endforeach; ?>
-            </div>
-          <?php endif; ?>
-
-          <form method="POST" action="signup.php">
+          <form name="signup" action="signupAction.php" class="was-validated">
             <div class="mb-3">
-              <label for="name" class="form-label">Full Name</label>
-              <input type="text" name="name" id="name" class="form-control" required value="<?php echo htmlspecialchars($name); ?>">
+              <label for="user" class="form-label">Full Name</label>
+              <input class="form-control" name="user" required>
+              <div class="valid-feedback">Valid.</div>
+              <div class="invalid-feedback">Please fill out this field.</div>
             </div>
 
             <div class="mb-3">
               <label for="email" class="form-label">Email Address</label>
-              <input type="email" name="email" id="email" class="form-control" required value="<?php echo htmlspecialchars($email); ?>">
+              <input type="email" class="form-control" name="email" required>
+              <div class="valid-feedback">Valid.</div>
+              <div class="invalid-feedback">Please fill out this field.</div>
             </div>
 
             <div class="mb-3">
-              <label for="password" class="form-label">Password</label>
-              <input type="password" name="password" id="password" class="form-control" required>
+              <label for="pswd" class="form-label">Password</label>
+              <input type="password" class="form-control" name="pswd" required>
+              <div class="valid-feedback">Valid.</div>
+              <div class="invalid-feedback">Please fill out this field.</div>
             </div>
 
             <div class="mb-3">
-              <label for="confirm_password" class="form-label">Confirm Password</label>
-              <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+              <label for="pswd2" class="form-label">Confirm Password</label>
+              <input type="password" class="form-control" name="pswd2" required>
+              <div class="valid-feedback">Valid.</div>
+              <div class="invalid-feedback">Please fill out this field.</div>
             </div>
 
             <button type="submit" class="btn btn-primary w-100">Create Account</button>
@@ -60,22 +59,5 @@
 </main>
 
     <?php include 'footer.php' ?>
-
-  <!-- Bootstrap validation script -->
-  <script>
-    (() => {
-      'use strict'
-      const forms = document.querySelectorAll('.needs-validation')
-      Array.from(forms).forEach(form => {
-        form.addEventListener('submit', event => {
-          if (!form.checkValidity()) {
-            event.preventDefault()
-            event.stopPropagation()
-          }
-          form.classList.add('was-validated')
-        }, false)
-      })
-    })()
-  </script>
 
 </body>
