@@ -56,12 +56,66 @@ if ($calendars->num_rows == 0) {
 } else {
     echo "<p>Calendars found: " . $calendars->num_rows . "</p>";
 }
+
+// Get the logged-in user's ID
+$user_id = $_SESSION['user_id'];
 ?>
+<script>
+$(document).ready(function() {
+    $('#calendar').fullCalendar({
+        height: 'auto', // Adjusts height to content
+        contentHeight: 400, // Max visible height
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        defaultView: 'month', // Default view
+        editable: true,
+        droppable: true, // Enable dragging and dropping
+        events: 'get_events.php', // Fetch events from your PHP script
+
+        eventClick: function(event) {
+            alert('Event: ' + event.title + '\nStarts: ' + event.start.format());
+        },
+
+        eventDrop: function(event, delta) {
+            alert(event.title + ' was moved ' + delta + ' days');
+        }
+    });
+});
+</script>
 
 
 <div class="d-flex flex-column min-vh-100">
   <main class="flex-grow-1">
+  <!-- FullCalendar CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.css" rel="stylesheet" />
+
+  <!-- jQuery and FullCalendar JS -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+   <div id="calendar"></div>
+   <style>
+   #calendar {
+       max-width: 600px;
+       margin: 0 auto;
+       font-size: 0.85rem;
+   }
+
+   .fc {
+       font-family: "Segoe UI", sans-serif;
+   }
+
+   .fc-event {
+       cursor: pointer;
+   }
+   </style>
+
+
     <div class="container mt-5">
+      <h1 class="mb-4">Welcome <?php echo $_SESSION['name'] ?></h1>
       <h2 class="mb-4">My Calendars</h2>
 
       <!-- Functional Buttons -->
