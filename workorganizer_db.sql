@@ -28,10 +28,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `calendar`
+-- Table structure for table `calendars`
 --
 
-CREATE TABLE `calendar` (
+CREATE TABLE `calendars` (
   `id` int(11) NOT NULL,
   `title` varchar(100) NOT NULL,
   `description` text NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE `calendar` (
 -- Dumping data for table `calendar`
 --
 
-INSERT INTO `calendar` (`id`, `title`, `description`, `month`, `year`) VALUES
+INSERT INTO `calendars` (`id`, `title`, `description`, `month`, `year`) VALUES
 (1, 'Test Calend', '', 'March', '2025'),
 (2, 'Test Calendar', '', 'February', '2025'),
 (3, 'Test Calendar', '', 'February', '2025'),
@@ -172,14 +172,6 @@ INSERT INTO `users` (`user_id`, `name`, `email`, `password`, `created_at`) VALUE
 (18, 'alacombe', 'clacombe@fitchburgstate.edu', 'clacombe', '2025-04-07 15:17:53');
 
 
-CREATE TABLE IF NOT EXISTS calendars (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  description TEXT,
-  user_id INT DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE `users_calendars` (
   `id` int(3) NOT NULL,
   `calendar_id` int(11) NOT NULL,
@@ -208,7 +200,7 @@ INSERT INTO `users_calendars` (`id`, `calendar_id`, `user_id`, `role_id`) VALUES
 --
 -- Indexes for table `calendar`
 --
-ALTER TABLE `calendar`
+ALTER TABLE `calendars`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -262,9 +254,9 @@ ALTER TABLE `users_calendars`
 --
 
 --
--- AUTO_INCREMENT for table `calendar`
+-- AUTO_INCREMENT for table `calendars`
 --
-ALTER TABLE `calendar`
+ALTER TABLE `calendars`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
