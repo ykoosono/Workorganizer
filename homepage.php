@@ -14,8 +14,8 @@ $query = $_GET['query'] ?? '';
 $likeQuery = '%' . $query . '%';
 
 $sortOptions = [
-    'alpha' => 'calendar_name ASC',
-    'recent' => 'start_date DESC',
+    'alpha' => 'title ASC',
+    'recent' => 'id DESC',
     'default' => 'id ASC',
 ];
 
@@ -23,24 +23,24 @@ $orderBy = $sortOptions[$sort] ?? $sortOptions['default'];
 
 $sql = "
     SELECT * FROM (
-        SELECT c.id, c.calendar_name, c.start_date, 'Lead' AS role_label
+        SELECT c.id, c.title, 'Lead' AS role_label
         FROM users_calendars uc
-        JOIN calendar c ON uc.calendar_id = c.id
-        WHERE uc.user_id = ? AND uc.role_id = 1 AND c.calendar_name LIKE ?
+        JOIN calendars c ON uc.calendar_id = c.id
+        WHERE uc.user_id = ? AND uc.role_id = 1 AND c.title LIKE ?
 
         UNION ALL
 
-        SELECT c.id, c.calendar_name, c.start_date, 'Member' AS role_label
+        SELECT c.id, c.title, 'Member' AS role_label
         FROM users_calendars uc
-        JOIN calendar c ON uc.calendar_id = c.id
-        WHERE uc.user_id = ? AND uc.role_id = 2 AND c.calendar_name LIKE ?
+        JOIN calendars c ON uc.calendar_id = c.id
+        WHERE uc.user_id = ? AND uc.role_id = 2 AND c.title LIKE ?
 
         UNION ALL
 
-        SELECT c.id, c.calendar_name, c.start_date, 'Viewer' AS role_label
+        SELECT c.id, c.title, 'Viewer' AS role_label
         FROM users_calendars uc
-        JOIN calendar c ON uc.calendar_id = c.id
-        WHERE uc.user_id = ? AND uc.role_id = 3 AND c.calendar_name LIKE ?
+        JOIN calendars c ON uc.calendar_id = c.id
+        WHERE uc.user_id = ? AND uc.role_id = 3 AND c.title LIKE ?
     ) AS all_calendars
     ORDER BY $orderBy
 ";
@@ -50,12 +50,7 @@ $stmt->bind_param("isisis", $userId, $likeQuery, $userId, $likeQuery, $userId, $
 $stmt->execute();
 $calendars = $stmt->get_result();
 
-// Debugging step: Check the SQL query result.
-if ($calendars->num_rows == 0) {
-    echo "<p>No calendars found. Please check your data and query parameters.</p>";
-} else {
-    echo "<p>Calendars found: " . $calendars->num_rows . "</p>";
-}
+
 ?>
 
 <div class="d-flex flex-column min-vh-100">
@@ -111,7 +106,7 @@ if ($calendars->num_rows == 0) {
 
         // Loop through the result set and render the cards
         while ($row = $calendars->fetch_assoc()) {
-            renderCalendarCard($row['id'], $row['calendar_name'], $row['role_label']);
+            renderCalendarCard($row['id'], $row['title'], $row['role_label']);
         }
         ?>
       </div>
