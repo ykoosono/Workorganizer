@@ -82,7 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 $incompleteEvents = $pdo->prepare("
     SELECT e.*, u.name AS assigned_to
     FROM events e
-    LEFT JOIN task_assignments ta ON e.id = ta.event_id
+    LEFT JOIN task_assignments ta ON e.event_id = ta.event_id
     LEFT JOIN users u ON ta.user_id = u.user_id
     WHERE e.calendar_id = ? AND e.is_complete = 0
     ORDER BY e.date ASC
@@ -93,7 +93,7 @@ $incompleteEvents = $incompleteEvents->fetchAll(PDO::FETCH_ASSOC);
 $completeEvents = $pdo->prepare("
     SELECT e.*, u.name AS assigned_to
     FROM events e
-    LEFT JOIN task_assignments ta ON e.id = ta.event_id
+    LEFT JOIN task_assignments ta ON e.event_id = ta.event_id
     LEFT JOIN users u ON ta.user_id = u.user_id
     WHERE e.calendar_id = ? AND e.is_complete = 1
     ORDER BY e.date ASC
