@@ -7,7 +7,7 @@ $month = $_GET["month"];
 $year = $_GET["year"];
 $desc = $_GET["desc"];
 
-$sql = "INSERT INTO calendar (title, description, month, year) VALUES ('" . $title . "', '" . $desc . "', '" . $month . "', '" . $year . "')";
+$sql = "INSERT INTO calendars (title, description, month, year) VALUES ('" . $title . "', '" . $desc . "', '" . $month . "', '" . $year . "')";
 
 $sql2 = "SELECT LAST_INSERT_ID() AS calendarID";
 
@@ -19,5 +19,6 @@ $userID = (int) $_SESSION['user_id'];
 
 $sql2 = "insert into users_calendars values (0, '" . $calendarID . "' , '". $userID . "', 1)";
 echo modifyDB($sql2);
+header("Location: homepage.php");
 ?>
 

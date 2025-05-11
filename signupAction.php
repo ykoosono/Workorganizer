@@ -26,10 +26,12 @@ else if (mysqli_num_rows($emailResult) > 0)
 else
 {
     $pswd = $_GET["pswd"];
+    $hashedPswd = password_hash($pswd, PASSWORD_DEFAULT);
 
     $sql = "insert into users(user_id, name, email, password) values (0, '" . $user . "', '" . $email . "', '" .
-      $pswd . "')";
+      $hashedPswd . "')";
 
-    echo modifyDB($sql) . "<br>Use back button to return";
+    echo modifyDB($sql);
+    header("Location: login.php");
 }
 ?>
