@@ -1,67 +1,90 @@
 <?php
-$host = "localhost";
-$dbname = "workorganizer_db";
-$username = "root";
-$password = "";
+session_start();
+$host = 'localhost';
+$db = 'workorganizer_db';
+$user = 'root';
+$pass = '';
 
-// Create connection
-$conn = new mysqli($host, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("DB error: " . $e->getMessage());
 }
 
-if (isset($_GET['token'])) {
-    $token = $_GET['token'];
+$token = $_GET['token'] ?? '';
+$error = '';
+$success = false;
+$resetData = null;
 
-    // Validate token
-    $query = "SELECT id, reset_token, token_expiry FROM users WHERE reset_token = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $token);
-    $stmt->execute();
-    $stmt->store_result();
+if (!$token) {
+    $error = "Invalid or missing token.";
+} else {
+    $stmt = $pdo->prepare("SELECT * FROM password_resets WHERE token = ? AND expires_at > NOW()");
+    $stmt->execute([$token]);
+    $resetData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($stmt->num_rows > 0) {
-        // Fetch user data
-        $stmt->bind_result($id, $db_token, $token_expiry);
-        $stmt->fetch();
+    if (!$resetData) {
+        $error = "Token is invalid or expired.";
+    }
+}
 
-        // Check if token is expired
-        if (new DateTime() > new DateTime($token_expiry)) {
-            echo "This token has expired.";
-        } else {
-            // Show the form to reset the password
-            echo '
-                <form method="POST" action="reset_password.php">
-                    <input type="hidden" name="token" value="' . $token . '">
-                    <label for="password">Enter New Password:</label>
-                    <input type="password" name="password" required>
-                    <button type="submit">Submit</button>
-                </form>
-            ';
-        }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $resetData) {
+    $new_password = $_POST['new_password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
+
+    if (strlen($new_password) < 6) {
+        $error = "Password must be at least 6 characters.";
+    } elseif ($new_password !== $confirm_password) {
+        $error = "Passwords do not match.";
     } else {
-        echo "Invalid token.";
+        $hashed = password_hash($new_password, PASSWORD_DEFAULT);
+        $pdo->prepare("UPDATE users SET password = ? WHERE email = ?")->execute([$hashed, $resetData['email']]);
+        $pdo->prepare("DELETE FROM password_resets WHERE token = ?")->execute([$token]);
+        $success = true;
     }
 }
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['token']) && isset($_POST['password'])) {
-        $token = $_POST['token'];
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-
-        // Update the password in the database
-        $query = "UPDATE users SET password = ?, reset_token = NULL, token_expiry = NULL WHERE reset_token = ?";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("ss", $password, $token);
-        $stmt->execute();
-
-        echo "Your password has been successfully reset.";
-    }
-}
-
-$conn->close();
 ?>
 
+<?php include 'header.php'; ?>
 
+<body style="background: linear-gradient(135deg, #e3f2fd, #ffffff); min-height: 100vh;">
+<main class="flex-grow-1">
+  <div class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card p-4 shadow-lg rounded">
+          <h2 class="text-center mb-4">Reset Password</h2>
+
+          <?php if ($success): ?>
+            <div class="alert alert-success">
+              Password has been reset. <a href="login.php">Login now</a>.
+            </div>
+          <?php elseif ($error): ?>
+            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
+          <?php endif; ?>
+
+          <?php if (!$success && $resetData): ?>
+            <form method="POST" action="">
+              <div class="mb-3">
+                <label for="new_password" class="form-label">New Password</label>
+                <input type="password" name="new_password" id="new_password" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Update Password</button>
+            </form>
+          <?php endif; ?>
+
+          <div class="mt-3 text-center">
+            <a href="login.php">Back to login</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<?php include 'footer.php'; ?>
+</body>

@@ -14,14 +14,14 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Home</a>
+    <a class="navbar-brand" href="homepage.php">Home</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="mynavbar">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link" href="create-calendar.html">New Calendar</a>
+          <a class="nav-link" href="addCalendar.php">New Calendar</a>
         </li>
       </ul>
       <ul class="navbar-nav ms-auto">
