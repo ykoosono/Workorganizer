@@ -1,6 +1,11 @@
 <?php
 include 'header.php';
-include('DBConnect.php'); 
+include('DBConnect.php');
+$message = openDB(); // initializes $conn
+
+if ($message !== "Connected") {
+    die("DB error: $message");
+}
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -49,7 +54,6 @@ $stmt = $conn->prepare($sql);
 $stmt->bind_param("isisis", $userId, $likeQuery, $userId, $likeQuery, $userId, $likeQuery);
 $stmt->execute();
 $calendars = $stmt->get_result();
-
 
 // Debugging step: Check the SQL query result.
 if ($calendars->num_rows == 0) {
