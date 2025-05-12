@@ -19,11 +19,6 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="mynavbar">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="addCalendar.php">New Calendar</a>
-        </li>
-      </ul>
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
           <a class="nav-link btn btn-danger text-white px-3" href="signout.php">Sign Out</a>
