@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 05, 2025 at 03:55 PM
+-- Generation Time: May 12, 2025 at 07:40 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -50,7 +50,11 @@ INSERT INTO `calendars` (`id`, `title`, `description`, `user_id`, `created_at`) 
 (8, 'Client Work', 'Tasks related to client deliverables.', 1, '2025-05-04 17:46:30'),
 (9, 'Company Events', 'Company-wide event planning.', 1, '2025-05-04 17:46:30'),
 (10, 'Freelance Schedule', 'Freelance client calendar.', 1, '2025-05-04 17:46:30'),
-(11, 'dsgfg', 'fdsggda', 1, '2025-05-04 20:51:30');
+(11, 'dsgfg', 'fdsggda', 1, '2025-05-04 20:51:30'),
+(12, 'ggggggg', 'hfhjghgjgj', 3, '2025-05-05 14:29:36'),
+(13, 'presentation', 'Elias, Casey, Yaw', 1, '2025-05-06 22:44:13'),
+(14, 'functions Test', 'test buttons \r\ntest user permissions', 1, '2025-05-08 14:29:05'),
+(15, 'User permissions', 'Check users to make sure they see all their calendars', 1, '2025-05-08 15:13:28');
 
 -- --------------------------------------------------------
 
@@ -81,20 +85,26 @@ INSERT INTO `events` (`id`, `calendar_id`, `title`, `date`, `details`, `is_compl
 (7, 3, 'Gym Session', '2025-05-03', 'Leg day workout.', 1),
 (8, 1, 'dd', '2025-05-07', 'ghfgfg', 0),
 (9, 1, 'jkgjkgkj', '2025-05-13', 'hkjh', 1),
-(0, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
-(0, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
-(0, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
-(0, 11, 'dddsdgs', '2025-05-04', 'sdfdgsdgg', 0),
-(0, 11, 'hhhhh', '2025-05-05', 'hjhfghjhghghj', 0),
-(0, 11, 'hhhhh', '2025-05-05', 'hjhfghjhghghj', 0),
-(0, 11, 'hhhhh', '2025-05-05', 'hjhfghjhghghj', 0),
-(0, 2, 'hjhjhjh', '2025-05-16', 'kjhkjghjkhjhk', 0),
-(0, 2, 'adaf', '2025-05-13', 'khjkgjk', 0),
-(0, 2, 'jhhgh', '2025-05-06', 'vhnvhvhvm', 0),
-(0, 11, 'nnn', '2025-05-14', 'dsgdgvvv', 0),
-(0, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
-(0, 1, 'jgjkgkjkb', '2025-05-07', ',mn,n,mnm', 0),
-(0, 1, 'bbbbbbbb', '2025-05-16', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 0);
+(10, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
+(11, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
+(12, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
+(13, 11, 'dddsdgs', '2025-05-04', 'sdfdgsdgg', 0),
+(14, 11, 'hhhhh', '2025-05-05', 'hjhfghjhghghj', 0),
+(15, 11, 'hhhhh', '2025-05-05', 'hjhfghjhghghj', 0),
+(16, 11, 'hhhhh', '2025-05-05', 'hjhfghjhghghj', 0),
+(17, 2, 'hjhjhjh', '2025-05-16', 'kjhkjghjkhjhk', 1),
+(18, 2, 'adaf', '2025-05-13', 'khjkgjk', 1),
+(19, 2, 'jhhgh', '2025-05-06', 'vhnvhvhvm', 1),
+(20, 11, 'nnn', '2025-05-14', 'dsgdgvvv', 0),
+(21, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
+(22, 1, 'jgjkgkjkb', '2025-05-07', ',mn,n,mnm', 1),
+(23, 1, 'bbbbbbbb', '2025-05-16', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 1),
+(24, 12, 'hfhfghf', '2025-05-06', 'hjfhjfhfh', 1),
+(25, 13, 'ttttttt', '2025-05-07', 'hnghjghjgjhghjgjhghj', 1),
+(26, 13, 'hhhhhhhhhhhhhhhhhh', '2025-05-09', 'llllllllllllllllllll', 1),
+(27, 13, 'ttttttt', '2025-05-08', 'ooo', 1),
+(28, 14, 'fix task', '2025-05-09', 'make sure task is not creating multiple task, \r\ntoggle is not working properly ', 0),
+(37, 15, 'assign to Casey', '2025-05-10', 'check in Casey account if calendar shows up', 0);
 
 -- --------------------------------------------------------
 
@@ -234,7 +244,13 @@ INSERT INTO `task_assignments` (`id`, `user_id`, `event_id`) VALUES
 (10, 1, 0),
 (11, 1, 0),
 (12, 2, 1),
-(13, 1, 8);
+(13, 1, 8),
+(14, 2, 0),
+(15, 3, 0),
+(16, 2, 0),
+(17, 1, 0),
+(18, 2, 0),
+(19, 2, 37);
 
 -- --------------------------------------------------------
 
@@ -255,7 +271,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `name`, `email`, `password`, `created_at`) VALUES
-(1, 'yaw', 'yawkoosono@yahoo.com', '$2y$10$cLXSYBkH9EGlCxPS5mMiJe3zthsyZu9L40j/Q/9ByRLs1T811ul3q', '2025-05-02 18:51:27'),
+(1, 'yaw', 'yawkoosono@yahoo.com', '$2y$10$doWkLWz.H0OXh5MYqoVvKeVtjZ9II9ODzGLGmmo/QbjEa.GEJudIG', '2025-05-02 18:51:27'),
 (2, 'casey', 'casey@yahoo.com', '$2y$10$9eKY6MfPHLgttscxYa.1r.vy74WJymMI3rOq.WI2IdCtbPtBwwKw6', '2025-05-04 18:13:38'),
 (3, 'elias', 'elias@yahoo.com', '$2y$10$0u42FLTDRD07CE1vYMNIIeiMckYdbP46eqGErggZWQZCGay80Mw3m', '2025-05-04 18:14:32');
 
@@ -290,7 +306,13 @@ INSERT INTO `users_calendars` (`id`, `calendar_id`, `user_id`, `role_id`) VALUES
 (11, 1, 1, 3),
 (12, 11, 1, 1),
 (13, 11, 2, 3),
-(14, 11, 3, 2);
+(14, 11, 3, 2),
+(15, 12, 3, 1),
+(16, 13, 1, 1),
+(17, 13, 2, 3),
+(18, 14, 1, 1),
+(19, 15, 1, 1),
+(20, 15, 2, 2);
 
 --
 -- Indexes for dumped tables
@@ -300,6 +322,12 @@ INSERT INTO `users_calendars` (`id`, `calendar_id`, `user_id`, `role_id`) VALUES
 -- Indexes for table `calendars`
 --
 ALTER TABLE `calendars`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `events`
+--
+ALTER TABLE `events`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -348,8 +376,7 @@ ALTER TABLE `task_assignments`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`),
-  ADD UNIQUE KEY `email` (`email`);
+  ADD PRIMARY KEY (`user_id`);
 
 --
 -- Indexes for table `users_calendars`
@@ -365,13 +392,19 @@ ALTER TABLE `users_calendars`
 -- AUTO_INCREMENT for table `calendars`
 --
 ALTER TABLE `calendars`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT for table `events`
+--
+ALTER TABLE `events`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `password_resets`
 --
 ALTER TABLE `password_resets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `permissions`
@@ -401,7 +434,7 @@ ALTER TABLE `tasks`
 -- AUTO_INCREMENT for table `task_assignments`
 --
 ALTER TABLE `task_assignments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -413,7 +446,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users_calendars`
 --
 ALTER TABLE `users_calendars`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- Constraints for dumped tables
