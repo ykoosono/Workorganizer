@@ -59,6 +59,7 @@ CREATE TABLE `events` (
   `is_complete` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+
 -- --------------------------------------------------------
 
 --
@@ -342,7 +343,7 @@ ALTER TABLE `tasks`
 -- AUTO_INCREMENT for table `task_assignments`
 --
 ALTER TABLE `task_assignments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `users`
