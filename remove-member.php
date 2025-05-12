@@ -116,7 +116,7 @@ $members = $membersStmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endforeach; ?>
     </ul>
 
-    <a href="view-calendar.php?id=<?php echo $calendarId; ?>" class="btn btn-secondary mt-4">Back</a>
+    <a href="view_calendar.php?id=<?php echo $calendarId; ?>" class="btn btn-secondary mt-4">Back</a>
 </div>
 
 <?php include 'footer.php'; ?>

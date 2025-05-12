@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_id'], $_POST['i
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         // Critical: Make sure the query targets a specific task only!
-        $stmt = $pdo->prepare("UPDATE events SET is_complete = ? WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE events SET is_complete = ? WHERE event_id = ?");
         $stmt->execute([$isComplete, $eventId]);
 
         echo json_encode(['success' => true]);
