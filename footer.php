@@ -1,5 +1,5 @@
 <!-- footer.php -->
-<footer class="bg-dark text-white mt-auto">
+<footer class="bg-dark text-white mt-auto" role="contentinfo">
   <div class="container py-2">
     <div class="row small">
       <div class="col-md-6">
@@ -18,3 +18,4 @@
 </footer>
 </body>
 </html>
+

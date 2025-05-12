@@ -1,3 +1,23 @@
+<head>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+    main {
+      flex: 1 0 auto; /* Allows main content to grow */
+    }
+    footer {
+      flex-shrink: 0; /* Prevents footer from shrinking */
+    }
+  </style>
+</head>
+
 <?php
 session_start();
 
@@ -34,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_SESSION['user_id'] = $user_id;
                 $_SESSION['name'] = $name;
 
-                header("Location: homepage.php");
+                header("Location:Homepage.php");
                 exit();
             } else {
                 $login_error = "Invalid email or password.";
@@ -90,8 +110,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
   </div>
 
-  <footer class="text-center mt-5 p-3 bg-light">
-    <p>&copy; 2025 WorkOrganizer. All rights reserved.</p>
-  </footer>
+<?php include 'footer.php' ?>
 </body>
 </html>
