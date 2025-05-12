@@ -95,3 +95,4 @@ function loginDB($sql, $user, $pwd) {
   }
   return $message;
 }
+
