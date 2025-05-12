@@ -11,9 +11,10 @@ $year = $_GET["year"];
 $desc = $_GET["desc"];
 
 
-$sql = "UPDATE calendar SET  title='" . $title . "', description='" . $desc . "', month='" . $month . "', year='" . $year . "'  WHERE id='" . $calendarID . "'";
+$sql = "UPDATE calendars SET  title='" . $title . "', description='" . $desc . "', month='" . $month . "', year='" . $year . "'  WHERE id='" . $calendarID . "'";
 
-echo modifyDB($sql) . "<br>Use back button to return";
+echo modifyDB($sql);
+header("Location: homepage.php");
 
 ?>
 
