@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 12, 2025 at 07:40 PM
+-- Generation Time: May 12, 2025 at 07:26 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,32 +29,19 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `calendars` (
   `id` int(11) NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
-  `user_id` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `title` varchar(100) NOT NULL,
+  `description` text NOT NULL,
+  `month` varchar(11) NOT NULL,
+  `year` year(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `calendars`
 --
 
-INSERT INTO `calendars` (`id`, `title`, `description`, `user_id`, `created_at`) VALUES
-(1, 'Project Alpha', 'Calendar for tracking Project Alpha tasks.ddd', 1, '2025-05-04 17:46:30'),
-(2, 'Marketing Campaign', 'Campaign planning and deadlines.', 1, '2025-05-04 17:46:30'),
-(3, 'Dev Sprint 1', 'Development sprint 1 timeline.', 1, '2025-05-04 17:46:30'),
-(4, 'HR Calendar', 'Internal HR-related events.', 1, '2025-05-04 17:46:30'),
-(5, 'QA Testing', 'QA schedules and deadlines.', 1, '2025-05-04 17:46:30'),
-(6, 'Product Launch', 'Roadmap to product launch.', 1, '2025-05-04 17:46:30'),
-(7, 'Team Meetings', 'Schedule for weekly team meetings.', 1, '2025-05-04 17:46:30'),
-(8, 'Client Work', 'Tasks related to client deliverables.', 1, '2025-05-04 17:46:30'),
-(9, 'Company Events', 'Company-wide event planning.', 1, '2025-05-04 17:46:30'),
-(10, 'Freelance Schedule', 'Freelance client calendar.', 1, '2025-05-04 17:46:30'),
-(11, 'dsgfg', 'fdsggda', 1, '2025-05-04 20:51:30'),
-(12, 'ggggggg', 'hfhjghgjgj', 3, '2025-05-05 14:29:36'),
-(13, 'presentation', 'Elias, Casey, Yaw', 1, '2025-05-06 22:44:13'),
-(14, 'functions Test', 'test buttons \r\ntest user permissions', 1, '2025-05-08 14:29:05'),
-(15, 'User permissions', 'Check users to make sure they see all their calendars', 1, '2025-05-08 15:13:28');
+INSERT INTO `calendars` (`id`, `title`, `description`, `month`, `year`) VALUES
+(1, 'Test Calendar', 'Test Calendar Test Edit', 'May', '2025'),
+(2, 'Test Calendar 2', 'Test Calendar', 'June', '2025');
 
 -- --------------------------------------------------------
 
@@ -63,48 +50,15 @@ INSERT INTO `calendars` (`id`, `title`, `description`, `user_id`, `created_at`) 
 --
 
 CREATE TABLE `events` (
-  `id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
   `calendar_id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `date` date NOT NULL,
-  `details` text DEFAULT NULL,
+  `details` text NOT NULL,
+  `assigned_to` varchar(100) NOT NULL,
   `is_complete` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `events`
---
-
-INSERT INTO `events` (`id`, `calendar_id`, `title`, `date`, `details`, `is_complete`) VALUES
-(1, 1, 'Kickoff', '2025-05-06', 'Initial meeting with stakeholders.', 0),
-(2, 1, 'Design Review', '2025-05-10', 'Present and review wireframes.', 1),
-(3, 1, 'Final Presentation', '2025-06-01', 'Deliver final demo and report.', 1),
-(4, 2, 'Campaign Launch', '2025-05-15', 'Launch summer campaign.', 1),
-(5, 2, 'Email Blast', '2025-05-20', 'Send marketing emails to subscribers.', 1),
-(6, 3, 'Doctor Appointment', '2025-05-02', 'Routine checkup at 10:00 AM.', 1),
-(7, 3, 'Gym Session', '2025-05-03', 'Leg day workout.', 1),
-(8, 1, 'dd', '2025-05-07', 'ghfgfg', 0),
-(9, 1, 'jkgjkgkj', '2025-05-13', 'hkjh', 1),
-(10, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
-(11, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
-(12, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
-(13, 11, 'dddsdgs', '2025-05-04', 'sdfdgsdgg', 0),
-(14, 11, 'hhhhh', '2025-05-05', 'hjhfghjhghghj', 0),
-(15, 11, 'hhhhh', '2025-05-05', 'hjhfghjhghghj', 0),
-(16, 11, 'hhhhh', '2025-05-05', 'hjhfghjhghghj', 0),
-(17, 2, 'hjhjhjh', '2025-05-16', 'kjhkjghjkhjhk', 1),
-(18, 2, 'adaf', '2025-05-13', 'khjkgjk', 1),
-(19, 2, 'jhhgh', '2025-05-06', 'vhnvhvhvm', 1),
-(20, 11, 'nnn', '2025-05-14', 'dsgdgvvv', 0),
-(21, 11, 'dfdsG', '2025-05-14', 'dsgdgvvv', 0),
-(22, 1, 'jgjkgkjkb', '2025-05-07', ',mn,n,mnm', 1),
-(23, 1, 'bbbbbbbb', '2025-05-16', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbb', 1),
-(24, 12, 'hfhfghf', '2025-05-06', 'hjfhjfhfh', 1),
-(25, 13, 'ttttttt', '2025-05-07', 'hnghjghjgjhghjgjhghj', 1),
-(26, 13, 'hhhhhhhhhhhhhhhhhh', '2025-05-09', 'llllllllllllllllllll', 1),
-(27, 13, 'ttttttt', '2025-05-08', 'ooo', 1),
-(28, 14, 'fix task', '2025-05-09', 'make sure task is not creating multiple task, \r\ntoggle is not working properly ', 0),
-(37, 15, 'assign to Casey', '2025-05-10', 'check in Casey account if calendar shows up', 0);
 
 -- --------------------------------------------------------
 
@@ -125,9 +79,9 @@ CREATE TABLE `password_resets` (
 --
 
 INSERT INTO `password_resets` (`id`, `email`, `token`, `expires_at`, `created_at`) VALUES
-(1, 'yawkoosono@yahoo.com', 'ee563e877b9bc7a08ec82e896ff9a2b7e4f717efee391a669bd2690e268cddc0', '2025-05-05 03:04:22', '2025-05-05 00:04:22'),
-(2, 'yawkoosono@yahoo.com', '569d66c6739f11da1822f0d71849de9fd4db93a84a5ff449aa70cc9bbec01b35', '2025-05-05 03:04:37', '2025-05-05 00:04:37'),
-(3, 'yawkoosono@yahoo.com', '33590c226760508933475c46d17ad882e01193e13d4588e34784dbcee211a43b', '2025-05-05 03:11:28', '2025-05-05 00:11:28');
+(1, 'yawkoosono@yahoo.com', 'ee563e877b9bc7a08ec82e896ff9a2b7e4f717efee391a669bd2690e268cddc0', '2025-05-05 03:04:22', '2025-05-05 04:04:22'),
+(2, 'yawkoosono@yahoo.com', '569d66c6739f11da1822f0d71849de9fd4db93a84a5ff449aa70cc9bbec01b35', '2025-05-05 03:04:37', '2025-05-05 04:04:37'),
+(3, 'yawkoosono@yahoo.com', '33590c226760508933475c46d17ad882e01193e13d4588e34784dbcee211a43b', '2025-05-05 03:11:28', '2025-05-05 04:11:28');
 
 -- --------------------------------------------------------
 
@@ -145,14 +99,11 @@ CREATE TABLE `permissions` (
 --
 
 INSERT INTO `permissions` (`id`, `permission_name`) VALUES
-(1, 'Add Member'),
-(7, 'Add Task'),
-(3, 'Assign Task'),
-(8, 'Delete Task'),
-(4, 'Edit Task'),
-(2, 'Remove Member'),
-(5, 'Toggle Control'),
-(6, 'View only');
+(3, 'Add Team Members'),
+(4, 'Assign Tasks'),
+(2, 'Edit Project'),
+(5, 'View Only Access'),
+(1, 'View Project');
 
 -- --------------------------------------------------------
 
@@ -170,9 +121,9 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id`, `role_name`) VALUES
-(1, 'team lead'),
-(2, 'team member'),
-(3, 'view only');
+(1, 'Lead Member'),
+(2, 'Team Member'),
+(3, 'View-Only Member');
 
 -- --------------------------------------------------------
 
@@ -195,12 +146,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `permission_id`) VALUES
 (2, 1, 2),
 (3, 1, 3),
 (4, 1, 4),
-(7, 2, 1),
-(8, 1, 5),
-(9, 2, 5),
-(10, 3, 6),
-(11, 1, 7),
-(12, 1, 8);
+(5, 2, 1),
+(6, 2, 2),
+(7, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -227,31 +175,6 @@ CREATE TABLE `task_assignments` (
   `event_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `task_assignments`
---
-
-INSERT INTO `task_assignments` (`id`, `user_id`, `event_id`) VALUES
-(1, 1, 1),
-(2, 1, 1),
-(3, 1, 0),
-(4, 1, 0),
-(5, 1, 0),
-(6, 2, 0),
-(7, 2, 0),
-(8, 2, 0),
-(9, 1, 0),
-(10, 1, 0),
-(11, 1, 0),
-(12, 2, 1),
-(13, 1, 8),
-(14, 2, 0),
-(15, 3, 0),
-(16, 2, 0),
-(17, 1, 0),
-(18, 2, 0),
-(19, 2, 37);
-
 -- --------------------------------------------------------
 
 --
@@ -263,7 +186,7 @@ CREATE TABLE `users` (
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -271,9 +194,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `name`, `email`, `password`, `created_at`) VALUES
-(1, 'yaw', 'yawkoosono@yahoo.com', '$2y$10$doWkLWz.H0OXh5MYqoVvKeVtjZ9II9ODzGLGmmo/QbjEa.GEJudIG', '2025-05-02 18:51:27'),
-(2, 'casey', 'casey@yahoo.com', '$2y$10$9eKY6MfPHLgttscxYa.1r.vy74WJymMI3rOq.WI2IdCtbPtBwwKw6', '2025-05-04 18:13:38'),
-(3, 'elias', 'elias@yahoo.com', '$2y$10$0u42FLTDRD07CE1vYMNIIeiMckYdbP46eqGErggZWQZCGay80Mw3m', '2025-05-04 18:14:32');
+(1, 'Casey LaCombe', 'clacombe@fsu.edu', '$2y$10$pRjp8ssCQs4edmSh33autO6vjWVrM/Sya4e4vn4Ojyr/T3y/wGCuG', '2025-05-11 20:19:32'),
+(2, 'Casey', 'clacombe@fitchburg.edu', '$2y$10$E7Aa3TmUbtPVdceaxi6p8uu7k0mdum7X69DNwyACm7yfzXVIS5ehK', '2025-05-12 16:20:23'),
+(3, 'Casey2', 'clacombe2@fsu.edu', 'clacombe', '2025-05-12 16:24:08');
 
 -- --------------------------------------------------------
 
@@ -282,7 +205,7 @@ INSERT INTO `users` (`user_id`, `name`, `email`, `password`, `created_at`) VALUE
 --
 
 CREATE TABLE `users_calendars` (
-  `id` int(11) NOT NULL,
+  `id` int(3) NOT NULL,
   `calendar_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL
@@ -293,26 +216,8 @@ CREATE TABLE `users_calendars` (
 --
 
 INSERT INTO `users_calendars` (`id`, `calendar_id`, `user_id`, `role_id`) VALUES
-(1, 0, 1, 1),
-(2, 0, 1, 1),
-(3, 0, 1, 1),
-(4, 0, 1, 1),
-(5, 0, 1, 1),
-(6, 0, 1, 1),
-(7, 0, 1, 1),
-(8, 0, 1, 1),
-(9, 1, 2, 2),
-(10, 1, 3, 2),
-(11, 1, 1, 3),
-(12, 11, 1, 1),
-(13, 11, 2, 3),
-(14, 11, 3, 2),
-(15, 12, 3, 1),
-(16, 13, 1, 1),
-(17, 13, 2, 3),
-(18, 14, 1, 1),
-(19, 15, 1, 1),
-(20, 15, 2, 2);
+(1, 1, 1, 1),
+(2, 2, 1, 1);
 
 --
 -- Indexes for dumped tables
@@ -328,15 +233,14 @@ ALTER TABLE `calendars`
 -- Indexes for table `events`
 --
 ALTER TABLE `events`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`event_id`),
+  ADD KEY `calendar_id` (`calendar_id`);
 
 --
 -- Indexes for table `password_resets`
 --
 ALTER TABLE `password_resets`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `email` (`email`),
-  ADD KEY `token` (`token`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `permissions`
@@ -370,7 +274,9 @@ ALTER TABLE `tasks`
 -- Indexes for table `task_assignments`
 --
 ALTER TABLE `task_assignments`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `event_id` (`event_id`);
 
 --
 -- Indexes for table `users`
@@ -382,7 +288,10 @@ ALTER TABLE `users`
 -- Indexes for table `users_calendars`
 --
 ALTER TABLE `users_calendars`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `calendar_id` (`calendar_id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `role_id` (`role_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -392,25 +301,25 @@ ALTER TABLE `users_calendars`
 -- AUTO_INCREMENT for table `calendars`
 --
 ALTER TABLE `calendars`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `password_resets`
 --
 ALTER TABLE `password_resets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `permissions`
 --
 ALTER TABLE `permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -422,7 +331,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `role_permissions`
 --
 ALTER TABLE `role_permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `tasks`
@@ -446,11 +355,17 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users_calendars`
 --
 ALTER TABLE `users_calendars`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `events`
+--
+ALTER TABLE `events`
+  ADD CONSTRAINT `events_ibfk_1` FOREIGN KEY (`calendar_id`) REFERENCES `calendars` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `role_permissions`
@@ -458,6 +373,20 @@ ALTER TABLE `users_calendars`
 ALTER TABLE `role_permissions`
   ADD CONSTRAINT `role_permissions_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `role_permissions_ibfk_2` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `task_assignments`
+--
+ALTER TABLE `task_assignments`
+  ADD CONSTRAINT `task_assignments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `task_assignments_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `users_calendars`
+--
+ALTER TABLE `users_calendars`
+  ADD CONSTRAINT `users_calendars_ibfk_5` FOREIGN KEY (`calendar_id`) REFERENCES `calendars` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `users_calendars_ibfk_6` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

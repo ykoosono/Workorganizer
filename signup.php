@@ -1,88 +1,49 @@
-<?php
-session_start();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign Up | WorkOrganizer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <?php include 'header.php' ?>
+</head>
+<body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
 
-$host = 'localhost';
-$db = 'workorganizer_db';
-$user = 'root';
-$pass = '';
-
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
-}
-
-$errors = [];
-$name = '';
-$email = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
-
-    if (!$name || !$email || !$password || !$confirm_password) {
-        $errors[] = "All fields are required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Invalid email format.";
-    } elseif ($password !== $confirm_password) {
-        $errors[] = "Passwords do not match.";
-    } else {
-        // Check for duplicate email
-        $stmt = $pdo->prepare("SELECT user_id FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        if ($stmt->fetch()) {
-            $errors[] = "Email is already registered.";
-        } else {
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-            $stmt->execute([$name, $email, $hashed_password]);
-
-            header("Location: login.php?registered=1");
-            exit;
-        }
-    }
-}
-?>
-
-<?php include 'header.php'; ?>
-<body class="d-flex flex-column min-vh-100">
-<main class="flex-grow-1">
-  <div class="container mt-5">
+  <!-- Sign Up Form -->
+  <div class="container my-5">
     <div class="row justify-content-center">
       <div class="col-md-6 col-lg-5">
         <div class="card p-4 shadow-lg rounded">
           <h2 class="text-center mb-4">Sign Up</h2>
-
-          <?php if (!empty($errors)): ?>
-            <div class="alert alert-danger">
-              <?php foreach ($errors as $error): ?>
-                <div><?php echo htmlspecialchars($error); ?></div>
-              <?php endforeach; ?>
-            </div>
-          <?php endif; ?>
-
-          <form method="POST" action="signup.php">
+          <form name="signup" action="signupAction.php" class="was-validated">
             <div class="mb-3">
-              <label for="name" class="form-label">Full Name</label>
-              <input type="text" name="name" id="name" class="form-control" required value="<?php echo htmlspecialchars($name); ?>">
+              <label for="user" class="form-label">Full Name</label>
+              <input class="form-control" name="user" required>
+              <div class="valid-feedback">Valid.</div>
+              <div class="invalid-feedback">Please fill out this field.</div>
             </div>
 
             <div class="mb-3">
               <label for="email" class="form-label">Email Address</label>
-              <input type="email" name="email" id="email" class="form-control" required value="<?php echo htmlspecialchars($email); ?>">
+              <input type="email" class="form-control" name="email" required>
+              <div class="valid-feedback">Valid.</div>
+              <div class="invalid-feedback">Please fill out this field.</div>
             </div>
 
             <div class="mb-3">
-              <label for="password" class="form-label">Password</label>
-              <input type="password" name="password" id="password" class="form-control" required>
+              <label for="pswd" class="form-label">Password</label>
+              <input type="password" class="form-control" name="pswd" required>
+              <div class="valid-feedback">Valid.</div>
+              <div class="invalid-feedback">Please fill out this field.</div>
             </div>
 
             <div class="mb-3">
-              <label for="confirm_password" class="form-label">Confirm Password</label>
-              <input type="password" name="confirm_password" id="confirm_password" class="form-control" required>
+              <label for="pswd2" class="form-label">Confirm Password</label>
+              <input type="password" class="form-control" name="pswd2" required>
+              <div class="valid-feedback">Valid.</div>
+              <div class="invalid-feedback">Please fill out this field.</div>
             </div>
 
             <button type="submit" class="btn btn-primary w-100">Create Account</button>
@@ -97,5 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 </main>
 
-<?php include 'footer.php'; ?>
+    <?php include 'footer.php' ?>
+
 </body>
