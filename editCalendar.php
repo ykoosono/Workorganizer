@@ -4,9 +4,11 @@ session_start();
 
 //$calendarID = $_GET[calendarID];
 //$_SESSION['calendar_id'] = $calendarID;
-$calendarID = (int) $_SESSION['calendar_id'];
+//$calendarID = (int) $_SESSION['calendar_id'];
+$calendarID = isset($_GET['id']) ? intval($_GET['id']) : null;
+$_SESSION['calendar_id'] = $calendarID;
 
-$sql = "select * from calendar where id='$calendarID'";
+$sql = "select * from calendars where id='$calendarID'";
 
 $result = queryDB($sql);
 

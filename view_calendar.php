@@ -343,6 +343,7 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
     <hr>
     <div class="mt-4 d-flex flex-wrap gap-2">
         <a href="homepage.php" class="btn btn-outline-primary">Back</a>
+        <a href="editCalendar.php?id=<?= urlencode($calendarId) ?>" class="btn btn-outline-secondary">Edit Calendar</a>
         <?php if(in_array(1, $userRolePermission)) { ?>
             <a href="add-member.php?id=<?= $calendarId ?>" class="btn btn-outline-info">Add Member</a>
             <?php if(in_array(2, $userRolePermission)) { ?>
