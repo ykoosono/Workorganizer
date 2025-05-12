@@ -1,6 +1,11 @@
 <?php
 include 'header.php';
-include('DBConnect.php'); 
+include('DBConnect.php');
+$message = openDB(); // initializes $conn
+
+if ($message !== "Connected") {
+    die("DB error: $message");
+}
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -50,18 +55,78 @@ $stmt->bind_param("isisis", $userId, $likeQuery, $userId, $likeQuery, $userId, $
 $stmt->execute();
 $calendars = $stmt->get_result();
 
+// Debugging step: Check the SQL query result.
+if ($calendars->num_rows == 0) {
+    echo "<p>No calendars found. Please check your data and query parameters.</p>";
+} else {
+    echo "<p>Calendars found: " . $calendars->num_rows . "</p>";
+}
 
+// Get the logged-in user's ID
+$user_id = $_SESSION['user_id'];
 ?>
+<script>
+$(document).ready(function() {
+    $('#calendar').fullCalendar({
+        height: 'auto', // Adjusts height to content
+        contentHeight: 400, // Max visible height
+        header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,agendaWeek,agendaDay'
+        },
+        defaultView: 'month', // Default view
+        editable: true,
+        droppable: true, // Enable dragging and dropping
+        events: 'get_events.php', // Fetch events from your PHP script
+
+        eventClick: function(event) {
+            alert('Event: ' + event.title + '\nStarts: ' + event.start.format());
+        },
+
+        eventDrop: function(event, delta) {
+            alert(event.title + ' was moved ' + delta + ' days');
+        }
+    });
+});
+</script>
+
 
 <div class="d-flex flex-column min-vh-100">
   <main class="flex-grow-1">
+  <!-- FullCalendar CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.css" rel="stylesheet" />
+
+  <!-- jQuery and FullCalendar JS -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.4.0/fullcalendar.min.js"></script>
+   <div id="calendar"></div>
+   <style>
+   #calendar {
+       max-width: 600px;
+       margin: 0 auto;
+       font-size: 0.85rem;
+   }
+
+   .fc {
+       font-family: "Segoe UI", sans-serif;
+   }
+
+   .fc-event {
+       cursor: pointer;
+   }
+   </style>
+
+
     <div class="container mt-5">
+      <h1 class="mb-4">Welcome <?php echo $_SESSION['name'] ?></h1>
       <h2 class="mb-4">My Calendars</h2>
 
       <!-- Functional Buttons -->
       <div class="row mb-4 align-items-center">
         <div class="col-md-4 mb-2 mb-md-0">
-          <a href="create-calendar.html" class="btn btn-success w-100">
+          <a href="addCalendar.php" class="btn btn-success w-100">
             <i class="bi bi-plus-circle"></i> Add New Calendar
           </a>
         </div>
@@ -115,4 +180,3 @@ $calendars = $stmt->get_result();
 
   <?php include 'footer.php'; ?>
 </div>
-
