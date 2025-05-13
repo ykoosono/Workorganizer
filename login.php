@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include 'header.php'; ?>
 
 <body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
+    <div id="wrap">
   <main class="flex-grow-1">
     <div class="container my-5">
       <div class="row justify-content-center">
@@ -82,6 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
   </main>
+    </div>
+    <div id="main"></div>
 
 <?php include 'footer.php'; ?>
 </body>
