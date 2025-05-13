@@ -1,4 +1,8 @@
-<!-- header.php -->
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,14 +19,17 @@
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="homepage.php">Home</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar"
+            aria-controls="mynavbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="mynavbar">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a class="nav-link btn btn-danger text-white px-3" href="signout.php">Sign Out</a>
-        </li>
+        <?php if (isset($_SESSION['user_id'])): ?>
+          <li class="nav-item">
+            <a class="nav-link btn btn-danger text-white px-3" href="signout.php">Sign Out</a>
+          </li>
+        <?php endif; ?>
       </ul>
     </div>
   </div>

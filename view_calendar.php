@@ -234,6 +234,7 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
                             <?php
 
                              if(in_array(4, $userRolePermission)) {
+                            echo "Move to Incomplete";
                             echo '<a href="?id='.$calendarId.'&edit_event='.$event['event_id'].'" class="btn btn-sm btn-outline-primary" title="Edit">
                                 <i class="bi bi-pencil-square"></i>
                             </a>';
