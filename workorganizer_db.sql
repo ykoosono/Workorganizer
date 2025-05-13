@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 12, 2025 at 07:26 PM
+-- Generation Time: May 14, 2025 at 01:08 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -30,18 +30,18 @@ SET time_zone = "+00:00";
 CREATE TABLE `calendars` (
   `id` int(11) NOT NULL,
   `title` varchar(100) NOT NULL,
-  `description` text NOT NULL,
-  `month` varchar(11) NOT NULL,
-  `year` year(4) NOT NULL
+  `description` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `calendars`
 --
 
-INSERT INTO `calendars` (`id`, `title`, `description`, `month`, `year`) VALUES
-(1, 'Test Calendar', 'Test Calendar Test Edit', 'May', '2025'),
-(2, 'Test Calendar 2', 'Test Calendar', 'June', '2025');
+INSERT INTO `calendars` (`id`, `title`, `description`) VALUES
+(1, 'Test Calendar', 'Test Calendar Test Edit'),
+(2, 'Test Calendar 2', 'Test Calendar'),
+(3, 'Test Calendar 3', 'Test Calendar'),
+(4, 'Test Calendar 4', 'Test Calendar');
 
 -- --------------------------------------------------------
 
@@ -53,12 +53,25 @@ CREATE TABLE `events` (
   `event_id` int(11) NOT NULL,
   `calendar_id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
-  `date` date NOT NULL,
+  `date` datetime NOT NULL,
   `details` text NOT NULL,
   `assigned_to` varchar(100) NOT NULL,
   `is_complete` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `events`
+--
+
+INSERT INTO `events` (`event_id`, `calendar_id`, `title`, `date`, `details`, `assigned_to`, `is_complete`) VALUES
+(1, 1, 'New Task', '2025-05-13 00:00:00', 'Test Task', '', 1),
+(2, 1, 'New Task', '2025-05-13 00:00:00', 'Test Task edit update', '', 1),
+(3, 1, 'New Task', '2025-05-13 00:00:00', 'Test Task edit update', '', 0),
+(4, 1, 'New Task', '2025-05-13 00:00:00', 'Test Task', '', 0),
+(5, 1, 'New Task', '2025-05-13 00:00:00', 'Test Task', '', 0),
+(6, 1, 'Test datetime', '2025-05-14 04:59:00', 'Test datetime', '', 0),
+(7, 1, 'New Task', '2025-05-14 15:02:00', 'Test Task edit update', '', 0),
+(8, 1, 'New Task Edit', '2025-05-16 03:03:00', 'Test Task edit update update', '', 0);
 
 -- --------------------------------------------------------
 
@@ -99,11 +112,14 @@ CREATE TABLE `permissions` (
 --
 
 INSERT INTO `permissions` (`id`, `permission_name`) VALUES
-(3, 'Add Team Members'),
-(4, 'Assign Tasks'),
-(2, 'Edit Project'),
-(5, 'View Only Access'),
-(1, 'View Project');
+(1, 'Add Member'),
+(7, 'Add Task'),
+(3, 'Assign Task'),
+(8, 'Delete Task'),
+(4, 'Edit Task'),
+(2, 'Remove Member'),
+(5, 'Toggle Control'),
+(6, 'View only');
 
 -- --------------------------------------------------------
 
@@ -121,7 +137,7 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id`, `role_name`) VALUES
-(1, 'Lead Member'),
+(1, 'Team Lead'),
 (2, 'Team Member'),
 (3, 'View-Only Member');
 
@@ -146,9 +162,12 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `permission_id`) VALUES
 (2, 1, 2),
 (3, 1, 3),
 (4, 1, 4),
-(5, 2, 1),
-(6, 2, 2),
-(7, 3, 1);
+(7, 2, 1),
+(8, 1, 5),
+(9, 2, 5),
+(10, 3, 6),
+(11, 1, 7),
+(12, 1, 8);
 
 -- --------------------------------------------------------
 
@@ -175,6 +194,15 @@ CREATE TABLE `task_assignments` (
   `event_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `task_assignments`
+--
+
+INSERT INTO `task_assignments` (`id`, `user_id`, `event_id`) VALUES
+(14, 1, 1),
+(15, 2, 2),
+(16, 1, 8);
+
 -- --------------------------------------------------------
 
 --
@@ -196,7 +224,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`user_id`, `name`, `email`, `password`, `created_at`) VALUES
 (1, 'Casey LaCombe', 'clacombe@fsu.edu', '$2y$10$pRjp8ssCQs4edmSh33autO6vjWVrM/Sya4e4vn4Ojyr/T3y/wGCuG', '2025-05-11 20:19:32'),
 (2, 'Casey', 'clacombe@fitchburg.edu', '$2y$10$E7Aa3TmUbtPVdceaxi6p8uu7k0mdum7X69DNwyACm7yfzXVIS5ehK', '2025-05-12 16:20:23'),
-(3, 'Casey2', 'clacombe2@fsu.edu', 'clacombe', '2025-05-12 16:24:08');
+(3, 'Casey2', 'clacombe2@fsu.edu', '$2y$10$fosOqDXTmQ6c4q4HcdJMN.cnGfAyf3utCkqAertayL5hx9X2dRov.', '2025-05-12 16:24:08');
 
 -- --------------------------------------------------------
 
@@ -217,7 +245,11 @@ CREATE TABLE `users_calendars` (
 
 INSERT INTO `users_calendars` (`id`, `calendar_id`, `user_id`, `role_id`) VALUES
 (1, 1, 1, 1),
-(2, 2, 1, 1);
+(2, 2, 1, 1),
+(3, 3, 1, 1),
+(4, 4, 1, 1),
+(6, 4, 2, 3),
+(7, 1, 2, 2);
 
 --
 -- Indexes for dumped tables
@@ -301,25 +333,25 @@ ALTER TABLE `users_calendars`
 -- AUTO_INCREMENT for table `calendars`
 --
 ALTER TABLE `calendars`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `password_resets`
 --
 ALTER TABLE `password_resets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `permissions`
 --
 ALTER TABLE `permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -331,7 +363,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `role_permissions`
 --
 ALTER TABLE `role_permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `tasks`
@@ -343,7 +375,7 @@ ALTER TABLE `tasks`
 -- AUTO_INCREMENT for table `task_assignments`
 --
 ALTER TABLE `task_assignments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -355,7 +387,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users_calendars`
 --
 ALTER TABLE `users_calendars`
-  MODIFY `id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables

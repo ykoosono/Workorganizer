@@ -10,7 +10,7 @@
   <?php include 'header.php' ?>
 </head>
 <body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
-
+    <div id="wrap">
   <!-- Sign Up Form -->
   <div class="container my-5">
     <div class="row justify-content-center">
@@ -56,8 +56,8 @@
       </div>
     </div>
   </div>
-</main>
-
+  <div id="main"></div>
+    </div>
     <?php include 'footer.php' ?>
-
 </body>
+</html>
