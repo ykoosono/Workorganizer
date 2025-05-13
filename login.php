@@ -15,7 +15,6 @@ try {
 
 $errors = [];
 $email = '';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
@@ -86,4 +85,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <?php include 'footer.php'; ?>
 </body>
-

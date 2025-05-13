@@ -30,7 +30,7 @@ $checkStmt = $pdo->prepare("
 $checkStmt->execute([$userId, $calendarId]);
 $role = $checkStmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$role || strtolower($role['role_name']) !== 'team lead') {
+if (!$role || strtolower($role['role_name']) == 'Viewer') {
     echo "<div class='alert alert-danger'>You must be a team lead to add members to this calendar.</div>";
     exit;
 }

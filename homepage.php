@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'header.php';
 include('DBConnect.php');
 $message = openDB(); // initializes $conn
@@ -6,7 +7,7 @@ $message = openDB(); // initializes $conn
 if ($message !== "Connected") {
     die("DB error: $message");
 }
-session_start();
+
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -179,7 +180,7 @@ $(document).ready(function() {
                   <h5 class="card-title">' . htmlspecialchars($calendarName) . '</h5>
                   <p class="card-text"><strong>Role:</strong> ' . htmlspecialchars($roleLabel) . '</p>
                   <p class="card-text">' . nl2br(htmlspecialchars($description)) . '</p>
-                  <a href="view-calendar.php?id=' . urlencode($calendarId) . '" class="btn btn-primary">View Calendar</a>
+                  <a href="view_calendar.php?id=' . urlencode($calendarId) . '" class="btn btn-primary">View Calendar</a>
                 </div>
               </div>
             </div>';
