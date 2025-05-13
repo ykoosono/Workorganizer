@@ -9,13 +9,13 @@ if (!$calendarId) {
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT id, title, date, is_complete FROM events WHERE calendar_id = ?");
+$stmt = $pdo->prepare("SELECT event_id, title, date, is_complete FROM events WHERE calendar_id = ?");
 $stmt->execute([$calendarId]);
 $events = [];
 
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
     $events[] = [
-        'id' => $row['id'],
+        'id' => $row['event_id'],
         'title' => $row['title'],
         'start' => $row['date'],
         'color' => $row['is_complete'] ? '#28a745' : '#ffc107'  // green for complete, amber for incomplete

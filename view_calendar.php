@@ -108,7 +108,7 @@ $completeEvents = $completeEvents->fetchAll(PDO::FETCH_ASSOC);
 
 $editingEvent = null;
 if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
-    $stmt = $pdo->prepare("SELECT * FROM events WHERE id = ? AND calendar_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM events WHERE event_id = ? AND calendar_id = ?");
     $stmt->execute([$_GET['edit_event'], $calendarId]);
     $editingEvent = $stmt->fetch(PDO::FETCH_ASSOC);
 }
@@ -186,19 +186,19 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
                         </div>
                         <div>
                         <?php if(in_array(5, $userRolePermission)) {
-                            echo '<button class="btn btn-sm btn-success toggle-complete" data-event-id="'.$event['id'].'" data-status="1" title="Mark Complete">
+                            echo '<button class="btn btn-sm btn-success toggle-complete" data-event-id="'.$event['event_id'].'" data-status="1" title="Mark Complete">
                                 <i class="bi bi-check-circle"></i>
                             </button>';
                             }
 
                              if(in_array(4, $userRolePermission)) {
-                            echo '<a href="?id='.$calendarId.'&edit_event='.$event['id'].'" class="btn btn-sm btn-outline-primary" title="Edit">
+                            echo '<a href="?id='.$calendarId.'&edit_event='.$event['event_id'].'" class="btn btn-sm btn-outline-primary" title="Edit">
                                 <i class="bi bi-pencil-square"></i>
                             </a>';
                              }
 
                             if(in_array(8, $userRolePermission)) {
-                            echo '<a href="?id='.$calendarId.'&delete_event='.$event['id'].'" class="btn btn-sm btn-outline-danger" title="Delete">
+                            echo '<a href="?id='.$calendarId.'&delete_event='.$event['event_id'].'" class="btn btn-sm btn-outline-danger" title="Delete">
                                 <i class="bi bi-trash"></i>
                             </a>';
                             }
@@ -227,20 +227,20 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
                         </div>
                         <div>
                         <?php if(in_array(5, $userRolePermission)) {?>
-                            <button class="btn btn-sm btn-secondary toggle-complete" data-event-id="<?= $event['id'] ?>" data-status="0" title="Mark Incomplete">
+                            <button class="btn btn-sm btn-secondary toggle-complete" data-event-id="<?= $event['event_id'] ?>" data-status="0" title="Mark Incomplete">
                                 <i class="bi bi-arrow-counterclockwise"></i>
                             </button>
                             <?php } ?>
                             <?php
 
                              if(in_array(4, $userRolePermission)) {
-                             echo "Move to Incomplete";
-                            echo '<a href="?id='.$calendarId.'&edit_event='.$event['id'].'" class="btn btn-sm btn-outline-primary" title="Edit">
+                            echo "Move to Incomplete";
+                            echo '<a href="?id='.$calendarId.'&edit_event='.$event['event_id'].'" class="btn btn-sm btn-outline-primary" title="Edit">
                                 <i class="bi bi-pencil-square"></i>
                             </a>';
                             }
                             if(in_array(8, $userRolePermission)) {
-                                                        echo '<a href="?id='.$calendarId.'&delete_event='.$event['id'].'" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                        echo '<a href="?id='.$calendarId.'&delete_event='.$event['event_id'].'" class="btn btn-sm btn-outline-danger" title="Delete">
                                                             <i class="bi bi-trash"></i>
                                                         </a>';
                             }
@@ -343,11 +343,11 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
     <hr>
     <div class="mt-4 d-flex flex-wrap gap-2">
         <a href="homepage.php" class="btn btn-outline-primary">Back</a>
-        <a href="editCalendar.php?id=<?= urlencode($calendarId) ?>" class="btn btn-outline-secondary">Edit Calendar</a>
         <?php if(in_array(1, $userRolePermission)) { ?>
             <a href="add-member.php?id=<?= $calendarId ?>" class="btn btn-outline-info">Add Member</a>
             <?php if(in_array(2, $userRolePermission)) { ?>
                 <a href="remove-member.php?id=<?= $calendarId ?>" class="btn btn-outline-danger">Remove Member</a>
+                <a href="editCalendar.php?id=<?= urlencode($calendarId) ?>" class="btn btn-outline-secondary">Edit Calendar</a>
             <?php } } ?>
     </div>
 </main>
