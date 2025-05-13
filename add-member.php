@@ -107,7 +107,7 @@ $members = $membersStmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
 
         <button type="submit" class="btn btn-success">Add Member</button>
-        <a href="view-calendar.php?id=<?php echo $calendarId; ?>" class="btn btn-secondary">Back</a>
+        <a href="view_calendar.php?id=<?php echo $calendarId; ?>" class="btn btn-secondary">Back</a>
     </form>
 
     <hr>
