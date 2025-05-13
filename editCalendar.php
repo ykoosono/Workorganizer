@@ -36,10 +36,13 @@ if ($result->num_rows > 0)
     </head>
     
     <body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
+        <div id="wrap">
         <div class="container fluid">
+            <div class="row"></div>
             <h1>Edit Calendar Information</h1>
             
             <form name="addCalendar" action="editCalendarAction.php" class="was-validated">
+                <div class="row"></div>
                 <div class="row">
                     <div class="col-md-6">
                         <label for="title" class="form-label">Calendar Title:</label>
@@ -54,20 +57,6 @@ if ($result->num_rows > 0)
                         <div class="invalid-feedback">Please fill out this field.</div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <label for="month" class="form-label">Month:</label>
-                        <input class="form-control" value="<?php echo $month ?>" name="month" required>
-                        <div class="valid-feedback">Valid.</div>
-                        <div class="invalid-feedback">Please fill out this field.</div>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="year" class="form-label">Year:</label>
-                        <input class="form-control" value="<?php echo $year ?>" name="year" required>
-                        <div class="valid-feedback">Valid.</div>
-                        <div class="invalid-feedback">Please fill out this field.</div>
-                    </div>
-                </div>
                 <div class="item">
                     <input type="submit" value="Submit" />
                     <input type="reset" value="Reset" />
@@ -77,6 +66,8 @@ if ($result->num_rows > 0)
             
             
         </div>
+        </div>
+        <div id="main"></div>
         <?php 'footer.php' ?>
     </body>
 </html>
