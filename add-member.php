@@ -100,10 +100,9 @@ $members = $membersStmt->fetchAll(PDO::FETCH_ASSOC);
             <label for="role_id" class="form-label">Assign Role</label>
             <select name="role_id" id="role_id" class="form-select" required>
                 <option value="">-- Select Role --</option>
-                <option value="<?php echo $roles[1]['id']; ?>"><?php echo htmlspecialchars($role['role_name']); ?></option>
-                <?php foreach ($roles as $role): ?>
+                <?php foreach (array_slice($roles, 1) as $role): ?>
+                <option value="<?php echo $role['id']; ?>"><?php echo htmlspecialchars($role['role_name']); ?></option>
                 <?php endforeach; ?>
-                <option value="<?php echo $roles[2]['id']; ?>"><?php echo htmlspecialchars($role['role_name']); ?></option>
             </select>
         </div>
 

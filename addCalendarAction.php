@@ -5,7 +5,7 @@ session_start();
 $title = $_GET["title"];
 $desc = $_GET["desc"];
 
-$sql = "INSERT INTO calendars (title, description, month, year) VALUES ('" . $title . "', '" . $desc . "')";
+$sql = "INSERT INTO calendars (title, description) VALUES ('" . $title . "', '" . $desc . "')";
 
 $sql2 = "SELECT LAST_INSERT_ID() AS calendarID";
 
