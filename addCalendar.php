@@ -1,33 +1,11 @@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <!-- your existing head content -->
-  <title>Add Calendar</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-  <?php include 'header.php' ?>
-  <style>
-    html, body {
-      height: 100%;
-    }
-    body {
-      display: flex;
-      flex-direction: column;
-    }
-    main {
-      flex: 1 0 auto; /* Allows main content to grow */
-    }
-    footer {
-      flex-shrink: 0; /* Prevents footer from shrinking */
-    }
-  </style>
-</head>
+<?php include 'header.php'; ?>
     <body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
-        <div class="container fluid">
+        <div id="wrap">
+        <main class="flex-grow-1">
+    <div class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+          <div class="card p-4 shadow-lg rounded">
             <h1>Add Calendar</h1>
             
 
@@ -54,10 +32,13 @@
                 
             </form>
             
-            
+          </div>
         </div>
+        </div>
+        </main>
+        </div>
+        <div id="main"></div>
         <?php include 'footer.php' ?>
     </body>
-</html>
 
 
