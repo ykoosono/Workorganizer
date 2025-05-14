@@ -197,11 +197,7 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
                             </a>';
                              }
 
-                            if(in_array(8, $userRolePermission)) {
-                            echo '<a href="?id='.$calendarId.'&delete_event='.$event['event_id'].'" class="btn btn-sm btn-outline-danger" title="Delete">
-                                <i class="bi bi-trash"></i>
-                            </a>';
-                            }
+                            
                             ?>
                         </div>
                     </li>
@@ -239,11 +235,7 @@ if (isset($_GET['edit_event']) && is_numeric($_GET['edit_event'])) {
                                 <i class="bi bi-pencil-square"></i>
                             </a>';
                             }
-                            if(in_array(8, $userRolePermission)) {
-                                                        echo '<a href="?id='.$calendarId.'&delete_event='.$event['event_id'].'" class="btn btn-sm btn-outline-danger" title="Delete">
-                                                            <i class="bi bi-trash"></i>
-                                                        </a>';
-                            }
+                            
                             ?>
 
 

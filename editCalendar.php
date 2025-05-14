@@ -17,8 +17,6 @@ if ($result->num_rows > 0)
     $row = $result->fetch_assoc();
     
     $title = $row["title"];
-    $month = $row["month"];
-    $year = $row["year"];
     $desc = $row["description"];
 }
 
@@ -37,8 +35,11 @@ if ($result->num_rows > 0)
     
     <body style="background: linear-gradient(135deg, #c0d6e4, #f0f4f8); min-height: 100vh;">
         <div id="wrap">
-        <div class="container fluid">
-            <div class="row"></div>
+        <main class="flex-grow-1">
+    <div class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+          <div class="card p-4 shadow-lg rounded">
             <h1>Edit Calendar Information</h1>
             
             <form name="addCalendar" action="editCalendarAction.php" class="was-validated">
@@ -63,9 +64,11 @@ if ($result->num_rows > 0)
                 </div>
                 
             </form>
-            
-            
+          </div>
+          </div>
         </div>
+    </div>
+        </main>
         </div>
         <div id="main"></div>
         <?php 'footer.php' ?>

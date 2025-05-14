@@ -1,25 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <!-- your existing head content -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    html, body {
-      height: 100%;
-    }
-    body {
-      display: flex;
-      flex-direction: column;
-    }
-    main {
-      flex: 1 0 auto; /* Allows main content to grow */
-    }
-    footer {
-      flex-shrink: 0; /* Prevents footer from shrinking */
-    }
-  </style>
-</head>
-<body>
+
 <?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
@@ -87,7 +66,7 @@ $members = $membersStmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <?php include 'header.php'; ?>
-
+<div id="wrap">
 <div class="container mt-5">
     <h3>Remove Members from Calendar</h3>
 
@@ -118,5 +97,7 @@ $members = $membersStmt->fetchAll(PDO::FETCH_ASSOC);
 
     <a href="view_calendar.php?id=<?php echo $calendarId; ?>" class="btn btn-secondary mt-4">Back</a>
 </div>
+</div>
+<div id="main"></div>
 
 <?php include 'footer.php'; ?>
